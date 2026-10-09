@@ -686,3 +686,8 @@ Se a pasta estiver em `Downloads`, troque o caminho para:
 ```bash
 cd /sdcard/Downloads/alem-da-nevoa-sheet
 ```
+
+
+## v62 — Estilos oficiais
+
+A lista de estilos dos sobreviventes foi substituída pelos estilos das referências: Escapista, Protetor, Rebelde, Reservado, Curioso, Guia, Místico, Resiliente, Gênio, Artista e Amigável.

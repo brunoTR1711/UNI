@@ -1,11 +1,5 @@
 {
-  "project": "Uma Noite no Inferno VTT",
-  "build": "v61-github-ready",
-  "base": "v60-corrige-overlay-dado",
-  "date": "2026-10-09",
-  "notes": [
-    "Pacote limpo para GitHub",
-    "Sem data/state.json da mesa",
-    "Com .gitignore, scripts de Termux e instruções de atualização"
-  ]
+  "version": "v62-estilos-oficiais",
+  "name": "Uma Noite no Inferno VTT",
+  "notes": "Substitui a lista de Estilos pela lista oficial enviada nas imagens: Escapista, Protetor, Rebelde, Reservado, Curioso, Guia, Místico, Resiliente, Gênio, Artista e Amigável."
 }

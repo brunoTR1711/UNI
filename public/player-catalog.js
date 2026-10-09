@@ -47,13 +47,19 @@
     exhaust:`<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 46c0-10 5-18 10-24 5 6 10 14 10 24" fill="none" stroke="currentColor" stroke-width="4"/><path d="M20 50h24M44 18c2 0 4-2 4-4m4 4c2 0 4-2 4-4" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`
   };
   const styles = [
-    { key:'resiliente', nome:'RESILIENTE', grupo:'Principal recomendado', descricao:'Sobrevivente estável para segurar pressão, ferimentos e decisões difíceis.', icon:'resiliente', stats:{cooperacao:2,folego:3,foco:3} },
-    { key:'investigativo', nome:'INVESTIGATIVO', grupo:'Principal recomendado', descricao:'Especialista em pistas, leitura de ambiente e mistério; frágil fisicamente.', icon:'investigativo', stats:{cooperacao:3,folego:1,foco:4} },
-    { key:'altruista', nome:'ALTRUÍSTA', grupo:'Principal recomendado', descricao:'Suporte do grupo, bom para resgates, proteção e manter todos juntos.', icon:'altruista', stats:{cooperacao:4,folego:1,foco:3} },
-    { key:'adepto', nome:'ADEPTO', grupo:'NPC jogável / reserva', descricao:'Curinga equilibrado para assumir no meio da sessão sem ficar perdido.', icon:'adepto', stats:{cooperacao:3,folego:2,foco:3} },
-    { key:'artistico', nome:'ARTÍSTICO', grupo:'NPC jogável / reserva', descricao:'Intuitivo e sensível ao horror, útil para símbolos, clima e decisões criativas.', icon:'artistico', stats:{cooperacao:2,folego:2,foco:4} },
-    { key:'rebelde', nome:'REBELDE', grupo:'NPC jogável / reserva', descricao:'Impulsivo e resistente, bom para risco, tensão e atitudes desesperadas.', icon:'rebelde', stats:{cooperacao:1,folego:3,foco:4} }
-  ];  const obscureAdvantages = [
+    { key:'escapista', nome:'ESCAPISTA', grupo:'Lista oficial', descricao:'A qualquer sinal do perigo, você está pronto para fugir. Seu fôlego é praticamente seu melhor amigo, mas isso traz consequências na hora de cooperar ou de manter o foco.', icon:'sprint', stats:{cooperacao:1,folego:6,foco:1} },
+    { key:'protetor', nome:'PROTETOR', grupo:'Lista oficial', descricao:'Ninguém ficará para trás enquanto você estiver vivo. Todos podem contar com sua ajuda sempre que precisarem.', icon:'shield', stats:{cooperacao:6,folego:1,foco:1} },
+    { key:'rebelde', nome:'REBELDE', grupo:'Lista oficial', descricao:'Você não aceita ordens de ninguém. Regras são feitas pra serem quebradas e geralmente é você quem desafia as autoridades.', icon:'rebelde', stats:{cooperacao:1,folego:3,foco:4} },
+    { key:'reservado', nome:'RESERVADO', grupo:'Lista oficial', descricao:'Você dificilmente confia nas outras pessoas, nem se abre muito facilmente pra ninguém. É melhor passar despercebido mesmo.', icon:'reservado', stats:{cooperacao:1,folego:4,foco:3} },
+    { key:'curioso', nome:'CURIOSO', grupo:'Lista oficial', descricao:'Você não resiste a um bom mistério. Sua alma de investigador te força a descobrir mais sobre o que está acontecendo; nenhum segredo ficará a salvo de você.', icon:'investigativo', stats:{cooperacao:3,folego:1,foco:4} },
+    { key:'guia', nome:'GUIA', grupo:'Lista oficial', descricao:'Você nasceu para liderar. Sua capacidade de coordenar uma equipe é inigualável, as pessoas confiam em você facilmente e você as leva para o caminho certo.', icon:'people', stats:{cooperacao:4,folego:1,foco:3} },
+    { key:'mistico', nome:'MÍSTICO', grupo:'Lista oficial', descricao:'Não é possível ignorar os sinais. Você é capaz de sentir presenças de outros planos e ver as auras dos outros sobreviventes; o além é claro e real pra você.', icon:'sensitivo', stats:{cooperacao:1,folego:1,foco:6} },
+    { key:'resiliente', nome:'RESILIENTE', grupo:'Lista oficial', descricao:'Dor e sofrimento são sinônimos da sua história. Não há feridas que você não possa lidar; você é do tipo guerreiro que aguenta os problemas como ninguém.', icon:'resiliente', stats:{cooperacao:2,folego:3,foco:3} },
+    { key:'genio', nome:'GÊNIO', grupo:'Lista oficial', descricao:'Todo enigma tem uma resposta, assim como os cálculos matemáticos. Sua inteligência é sua maior arma nesse cenário, sua capacidade cognitiva é acima da média.', icon:'intelectual', stats:{cooperacao:2,folego:1,foco:5} },
+    { key:'artista', nome:'ARTISTA', grupo:'Lista oficial', descricao:'A vida é uma pintura a óleo de uma praia florida. A arte é a essência da sociedade e você nasceu para brilhar e se destacar; sua presença é radiante e todos sempre olham pra você.', icon:'artistico', stats:{cooperacao:2,folego:2,foco:4} },
+    { key:'amigavel', nome:'AMIGÁVEL', grupo:'Lista oficial', descricao:'Todos precisam de um apoio emocional, um ombro amigo, alguém pra contar, e você é essa pessoa. Todos podem contar com sua ajuda; sempre que precisarem de você, você estará lá.', icon:'altruista', stats:{cooperacao:4,folego:2,foco:2} }
+  ];
+  const obscureAdvantages = [
     { key:'aranhas-tecelas', nome:'Aranhas Tecelãs', icon:'web', tipo:'obscura', descricao:'Prenda o assassino: ele não age até se soltar. (1 vez por jogo)'},
     { key:'corvos-traicoeiros', nome:'Corvos Traiçoeiros', icon:'crow', tipo:'obscura', descricao:'O assassino fica Cego (não pode acertar golpes normalmente) e você resiste ao próximo golpe. (1 vez por jogo)'},
     { key:'teoria-das-trevas', nome:'Teoria das Trevas', icon:'ritual', tipo:'obscura', descricao:'Todos na perseguição ganham Sorte (1 rerrolagem). (1 vez por jogo)'},

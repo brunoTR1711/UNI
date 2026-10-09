@@ -11,7 +11,7 @@ const io = new Server(server, { maxHttpBufferSize: 16 * 1024 * 1024 });
 const PORT = Number(process.env.PORT || 3000);
 const DATA_DIR = path.join(__dirname, "data");
 const DATA_PATH = path.join(DATA_DIR, "state.json");
-const APP_VERSION = "v61-github";
+const APP_VERSION = "v62-estilos";
 const DICE_ANIMATION_MS = 3000;
 app.disable("etag");
 app.use(express.json({ limit: "16mb" }));
@@ -27,12 +27,27 @@ app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0,
 const ALLOWED_THEME_PRESETS = new Set(["ciano", "magenta", "ambar", "verde", "violeta", "laranja", "azul"]);
 
 const SURVIVOR_STYLES = {
+  escapista: { key: "escapista", nome: "ESCAPISTA", stats: { cooperacao: 1, folego: 6, foco: 1 } },
+  protetor: { key: "protetor", nome: "PROTETOR", stats: { cooperacao: 6, folego: 1, foco: 1 } },
+  rebelde: { key: "rebelde", nome: "REBELDE", stats: { cooperacao: 1, folego: 3, foco: 4 } },
+  reservado: { key: "reservado", nome: "RESERVADO", stats: { cooperacao: 1, folego: 4, foco: 3 } },
+  curioso: { key: "curioso", nome: "CURIOSO", stats: { cooperacao: 3, folego: 1, foco: 4 } },
+  guia: { key: "guia", nome: "GUIA", stats: { cooperacao: 4, folego: 1, foco: 3 } },
+  mistico: { key: "mistico", nome: "MÍSTICO", stats: { cooperacao: 1, folego: 1, foco: 6 } },
   resiliente: { key: "resiliente", nome: "RESILIENTE", stats: { cooperacao: 2, folego: 3, foco: 3 } },
-  investigativo: { key: "investigativo", nome: "INVESTIGATIVO", stats: { cooperacao: 3, folego: 1, foco: 4 } },
-  altruista: { key: "altruista", nome: "ALTRUÍSTA", stats: { cooperacao: 4, folego: 1, foco: 3 } },
-  adepto: { key: "adepto", nome: "ADEPTO", stats: { cooperacao: 3, folego: 2, foco: 3 } },
-  artistico: { key: "artistico", nome: "ARTÍSTICO", stats: { cooperacao: 2, folego: 2, foco: 4 } },
-  rebelde: { key: "rebelde", nome: "REBELDE", stats: { cooperacao: 1, folego: 3, foco: 4 } }
+  genio: { key: "genio", nome: "GÊNIO", stats: { cooperacao: 2, folego: 1, foco: 5 } },
+  artista: { key: "artista", nome: "ARTISTA", stats: { cooperacao: 2, folego: 2, foco: 4 } },
+  amigavel: { key: "amigavel", nome: "AMIGÁVEL", stats: { cooperacao: 4, folego: 2, foco: 2 } }
+};
+const LEGACY_SURVIVOR_STYLE_MAP = {
+  robusto: "resiliente",
+  investigativo: "curioso",
+  altruista: "amigavel",
+  adepto: "guia",
+  sensitivo: "mistico",
+  intelectual: "genio",
+  artistico: "artista",
+  diplomatico: "amigavel"
 };
 function isStyleTakenByOther(styleKey, characterId) {
   return Object.values(state.characters || {}).some((entry) => entry?.id !== characterId && entry?.styleKey === styleKey);
@@ -220,6 +235,13 @@ function normalizeCharacter(character, id) {
   result.id = id;
   result.portraits = { ...base.portraits, ...(character?.portraits || {}) };
   result.styleStats = { ...base.styleStats, ...(character?.styleStats || {}) };
+  const resolvedStyleKey = LEGACY_SURVIVOR_STYLE_MAP[result.styleKey] || result.styleKey;
+  const resolvedStyle = SURVIVOR_STYLES[resolvedStyleKey];
+  if (resolvedStyle) {
+    result.styleKey = resolvedStyle.key;
+    result.estilo = resolvedStyle.nome;
+    result.styleStats = { ...resolvedStyle.stats };
+  }
   result.resources = {
     cooperacao: { ...baseResource(), ...(character?.resources?.cooperacao || {}) },
     folego: { ...baseResource(), ...(character?.resources?.folego || {}) },
