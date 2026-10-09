@@ -1,0 +1,14 @@
+{
+  "name": "Uma Noite no Inferno — Ficha Lite",
+  "short_name": "Noite Inferno",
+  "description": "Ficha mobile para jogadores e mestre da one-shot Uma Noite no Inferno.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050607",
+  "theme_color": "#050607",
+  "icons": [
+    { "src": "/android-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

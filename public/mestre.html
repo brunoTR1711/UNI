@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050607" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>Uma Noite no Inferno — Mestre</title>
+  <link rel="stylesheet" href="/style.css?v=61" />
+</head>
+<body class="master-page lite-page master-vhs-page">
+  <main class="master-vhs-shell">
+    <header class="master-vhs-title">
+      <div>
+        <h1>UMA NOITE NO INFERNO</h1>
+        <p>Mestre</p>
+      </div>
+      <nav class="master-vhs-nav" aria-label="Navegação rápida">
+        <a href="/" target="_blank">CENTRAL</a>
+        <a href="/jogadores" target="_blank">JOGADORES</a>
+        <a href="/overlay" target="_blank">OVERLAY</a>
+        <a href="/efeitos" target="_blank">FX</a>
+      </nav>
+    </header>
+
+    <section class="master-vhs-layout">
+      <aside class="master-vhs-left">
+        <section class="vhs-master-block vhs-threat-controls">
+          <div class="vhs-control-line">
+            <h2>Causar dano:</h2>
+            <select id="damage-target-select" class="dark-input" aria-label="Alvo do dano"></select>
+          </div>
+          <div class="vhs-damage-grid">
+            <button type="button" data-threat="damage-light">LEVE</button>
+            <button type="button" data-threat="damage-heavy">PESADO</button>
+            <button type="button" data-threat="damage-mortal">MORTAL</button>
+          </div>
+
+          <div class="vhs-control-line vhs-control-line--spaced">
+            <h2>Causar efeito:</h2>
+            <select id="effect-target-select" class="dark-input" aria-label="Alvo do efeito"></select>
+          </div>
+          <div id="effect-button-grid" class="vhs-effect-grid"></div>
+          <button id="clear-effects-button" class="vhs-clear-effects" type="button">LIMPAR EFEITOS DO ALVO</button>
+
+          <div class="vhs-control-line vhs-control-line--spaced">
+            <h2>Obsessão:</h2>
+            <select id="obsession-target-select" class="dark-input" aria-label="Alvo da obsessão"></select>
+          </div>
+        </section>
+
+        <section class="vhs-master-block vhs-target-preview" id="target-preview"></section>
+
+        <section class="vhs-master-block vhs-assassin-placeholder">
+          <header class="vhs-block-head">
+            <small>EXCLUSIVO DO ASSASSINO</small>
+            <h2>Vantagens</h2>
+          </header>
+          <div id="killer-advantages-slot" class="vhs-killer-exclusive-list"></div>
+        </section>
+
+        <section class="vhs-master-block vhs-assassin-placeholder">
+          <header class="vhs-block-head">
+            <small>EXCLUSIVO DO ASSASSINO</small>
+            <h2>Habilidades</h2>
+          </header>
+          <div id="killer-abilities-slot" class="vhs-killer-exclusive-list"></div>
+        </section>
+      </aside>
+
+      <section class="vhs-master-block vhs-roll-history-panel">
+        <header class="vhs-block-head centered">
+          <small>CONSULTA RÁPIDA</small>
+          <h2>Histórico de rolagens</h2>
+        </header>
+        <div id="roll-history-list" class="vhs-roll-history-list"></div>
+      </section>
+
+      <section class="master-vhs-roster-area">
+        <form id="create-form" class="master-add-player">
+          <button class="master-add-button" type="submit" title="Adicionar personagem">+</button>
+          <div class="master-add-fields">
+            <input id="create-id" class="dark-input" placeholder="id opcional: leandro" />
+            <input id="create-name" class="dark-input" placeholder="nome do personagem" />
+          </div>
+        </form>
+
+        <header class="vhs-roster-head">
+          <small>RESUMO DAS INFORMAÇÕES DOS PERSONAGENS</small>
+          <h2>Sobreviventes</h2>
+        </header>
+        <section id="master-grid" class="master-vhs-character-grid"></section>
+      </section>
+    </section>
+  </main>
+
+  <div id="killer-picker-modal" class="master-killer-modal" hidden>
+    <div class="master-killer-modal-backdrop" data-modal-close="true"></div>
+    <div class="advantage-modal-card master-killer-modal-card" role="dialog" aria-modal="true" aria-labelledby="killer-picker-title">
+      <header class="vhs-block-head">
+        <small id="killer-picker-kicker">ASSASSINO</small>
+        <h2 id="killer-picker-title">Selecionar</h2>
+      </header>
+      <input id="killer-picker-search" class="dark-input" placeholder="Pesquisar..." />
+      <div id="killer-picker-list" class="vhs-placeholder-list master-killer-picker-list"></div>
+      <div class="lite-master-actions">
+        <button id="killer-picker-clear" type="button">REMOVER DO SLOT</button>
+        <button id="killer-picker-cancel" type="button">FECHAR</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/player-catalog.js?v=61"></script>
+  <script src="/assassin-catalog.js?v=61"></script>
+  <script src="/common.js?v=61"></script>
+  <script src="/audio.js?v=61"></script>
+  <script src="/mestre.js?v=61"></script>
+</body>
+</html>

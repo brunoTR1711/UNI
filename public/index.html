@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050607" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>Uma Noite no Inferno — Central</title>
+  <link rel="stylesheet" href="/style.css?v=61" />
+</head>
+<body class="landing-page">
+  <main class="landing-shell">
+    <section class="landing-card">
+      <p class="eyebrow">UMA NOITE NO INFERNO</p>
+      <h1><a class="title-link" href="https://online.anyflip.com/obrff/nsjc/mobile/index.html" target="_blank" rel="noopener">ALÉM DA <span>NÉVOA</span></a></h1>
+      <p class="landing-copy">
+        Versão simplificada para a one-shot Uma Noite no Inferno: sobreviventes, recursos, condições, itens e efeitos cênicos essenciais para OBS.
+      </p>
+
+      <div class="landing-actions">
+        <a class="primary-button" href="/mestre">ABRIR PAINEL DO MESTRE</a>
+        <a class="secondary-button" href="/jogadores">ABRIR PAINEL DE JOGADOR</a>
+        <a class="secondary-button" href="/overlay">ABRIR OVERLAY</a>
+      </div>
+
+      <section class="network-panel">
+        <h2>ENDEREÇOS DA REDE</h2>
+        <div id="network-list">Carregando...</div>
+      </section>
+
+      <p class="landing-note">
+        Crie os personagens no painel do mestre. Cada personagem terá um link para o jogador e outro link individual para adicionar como fonte Navegador no OBS.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    fetch("/api/network")
+      .then((response) => response.json())
+      .then(({ ips, port }) => {
+        const list = document.getElementById("network-list");
+        const urls = [
+          `http://localhost:${port}`,
+          `http://localhost:${port}/mestre`,
+          `http://localhost:${port}/jogadores`,
+          `http://localhost:${port}/overlay`,
+          ...ips.flatMap((ip) => [`http://${ip}:${port}`, `http://${ip}:${port}/jogadores`, `http://${ip}:${port}/overlay`])
+        ];
+        list.innerHTML = urls
+          .map((url) => `<code>${url}</code>`)
+          .join("");
+      })
+      .catch(() => {
+        document.getElementById("network-list").textContent =
+          "Não foi possível detectar os endereços automaticamente.";
+      });
+  </script>
+</body>
+</html>

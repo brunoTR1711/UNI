@@ -1,0 +1,234 @@
+:root{--blood:#b30b19;--blood-dark:#3b0207;--bone:#f1ece5;--ash:#8d9290;--ink:#050607;--yellow:#f0c930}.assassin-master-page{background:radial-gradient(circle at 90% 0,rgba(123,0,10,.27),transparent 34rem),linear-gradient(rgba(4,5,6,.94),rgba(4,5,6,.99)),repeating-linear-gradient(112deg,rgba(255,255,255,.018) 0 2px,transparent 2px 8px);color:var(--bone);font-family:Arial,Helvetica,sans-serif}.assassin-master-shell{max-width:1500px;margin:auto;padding:18px}.assassin-master-hero,.assassin-create{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:15px;padding:17px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(135deg,rgba(0,0,0,.75),rgba(55,2,7,.46));box-shadow:0 18px 40px rgba(0,0,0,.36)}.assassin-master-hero h1{margin:0;font-family:Impact,Arial Black,sans-serif;font-size:54px;letter-spacing:.04em}.assassin-master-hero p{max-width:760px;color:#c4c2bd}.assassin-master-hero nav,.assassin-create form{display:flex;flex-wrap:wrap;gap:7px}.assassin-master-hero a,.assassin-card-links button,.assassin-card-footer a,.assassin-card-footer button,.assassin-panel button,.assassin-style-row button{padding:9px 11px;border:1px solid rgba(255,255,255,.11);color:#eee;background:rgba(0,0,0,.38);font-size:11px;font-weight:900;letter-spacing:.08em;text-decoration:none}.assassin-master-grid{display:grid;gap:16px}.assassin-control-card{overflow:hidden;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,rgba(9,10,11,.97),rgba(36,3,7,.90));box-shadow:0 16px 42px rgba(0,0,0,.42)}.assassin-card-header{display:grid;grid-template-columns:126px 1fr auto;gap:14px;align-items:center;padding:13px;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(90deg,rgba(0,0,0,.88),rgba(93,3,12,.30))}.assassin-portrait-upload{display:grid;height:102px;place-items:center;overflow:hidden;background:#070809;border:1px solid rgba(255,255,255,.09);cursor:pointer}.assassin-portrait-upload img{width:100%;height:100%;object-fit:cover}.assassin-portrait-upload svg{width:58px;height:58px}.assassin-portrait-upload input{display:none}.assassin-card-title{display:grid;gap:4px}.assassin-name-input{min-width:0;border:0;border-bottom:1px solid rgba(255,255,255,.08);color:white;background:transparent;font-family:Impact,Arial Black,sans-serif;font-size:34px;letter-spacing:.04em}.assassin-card-title strong{color:var(--yellow);font-size:15px;letter-spacing:.14em}.assassin-card-title small{color:#989d9a}.assassin-card-links{display:flex;flex-wrap:wrap;max-width:310px;justify-content:flex-end;gap:5px}.assassin-style-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 17px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.16)}.assassin-style-row h3{margin:0;color:var(--yellow);font-family:Impact,Arial Black,sans-serif;font-size:27px;letter-spacing:.05em}.assassin-style-row p{margin:5px 0 0;max-width:920px;color:#c5c7c3;font-size:13px;line-height:1.45}.killer-stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid rgba(255,255,255,.06)}.killer-stat{display:grid;grid-template-columns:55px 1fr auto;gap:9px;align-items:center;min-height:86px;padding:12px;border-right:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.025),transparent)}.killer-stat-icon,.selected-special>span{display:grid;place-items:center;width:48px;height:48px;color:#f5f5ef;background:linear-gradient(135deg,#3a050a,#070708);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}.killer-stat svg,.selected-special svg{width:28px;height:28px}.killer-stat small{display:block;color:#a4a9a6;font-size:10px;font-weight:900;letter-spacing:.14em}.killer-stat strong{font-family:Impact,Arial Black,sans-serif;font-size:34px}.killer-stat-actions{display:grid;gap:3px}.killer-stat-actions button{width:27px;height:27px;border:1px solid rgba(255,255,255,.12);color:white;background:#120608}.assassin-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}.assassin-panel{margin:10px;padding:13px;border:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.27)}.selected-special{display:grid;grid-template-columns:55px 1fr;gap:10px;align-items:center}.selected-special h3{margin:0;color:var(--yellow);font-family:Impact,Arial Black,sans-serif;letter-spacing:.05em}.selected-special p,.muted{margin:5px 0;color:#bec2bf;font-size:12px;line-height:1.45}.row-actions,.damage-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.chase-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.chase-grid label{display:grid;gap:4px;color:#aeb4b0;font-size:10px;font-weight:900;letter-spacing:.11em}.chase-grid select,.chase-grid input{padding:7px;border:1px solid rgba(255,255,255,.09);color:white;background:#0b0d0e}.chase-grid button.active{border-color:rgba(226,32,43,.6);background:#6f0710}.toggle{grid-column:1/-1;display:flex!important;grid-template-columns:auto 1fr!important;align-items:center}.killer-advantages{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.killer-advantages button{display:grid;grid-template-columns:48px 1fr;gap:9px;align-items:center;text-align:left}.killer-advantages span{display:grid;width:41px;height:41px;place-items:center;color:white;background:#1a0a0d;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}.killer-advantages svg{width:23px;height:23px}.killer-advantages small{color:#9ba09e;letter-spacing:.1em}.killer-advantages strong{display:block;color:#f2edeb}.killer-advantages p{margin:3px 0 0;color:#b6bab8;font-size:11px}.show-panel{background:linear-gradient(135deg,rgba(44,2,6,.34),rgba(0,0,0,.25))}.show-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:7px}.show-buttons button{display:grid;grid-template-columns:30px 1fr;gap:6px;align-items:center;text-align:left}.show-buttons span{display:grid;place-items:center;width:28px;height:28px}.show-buttons svg{width:22px;height:22px}.show-heavy{border-color:rgba(197,19,30,.4)!important}.show-extreme{border-color:rgba(241,31,43,.72)!important;background:rgba(117,3,12,.58)!important}.danger{color:#ff9da4!important;border-color:rgba(220,35,48,.45)!important}.assassin-card-footer{display:flex;gap:7px;padding:10px 13px;border-top:1px solid rgba(255,255,255,.06)}.assassin-empty{padding:30px;text-align:center;border:1px dashed rgba(255,255,255,.15)}.assassin-picker-list{max-height:68vh;overflow:auto;padding:12px}.assassin-picker-item{display:grid;grid-template-columns:58px 1fr;gap:10px;width:100%;margin-bottom:7px;padding:11px;border:1px solid rgba(255,255,255,.08);color:white;background:linear-gradient(90deg,rgba(0,0,0,.8),rgba(37,4,7,.55));text-align:left}.assassin-picker-item span{display:grid;width:48px;height:48px;place-items:center;color:white;background:#17070a;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}.assassin-picker-item svg{width:28px;height:28px}.assassin-picker-item h3{margin:0;color:var(--yellow);font-family:Impact,Arial Black,sans-serif;letter-spacing:.05em}.assassin-picker-item small{color:#e4bd2d}.assassin-picker-item p{margin:5px 0 0;color:#c6cac7;font-size:12px}
+/* overlay */.assassin-overlay-page,.effects-page{margin:0;background:transparent;overflow:hidden}.assassin-overlay-root{display:flex;flex-wrap:wrap;gap:16px;padding:16px}.killer-overlay-card{position:relative;overflow:hidden;width:720px;min-height:300px;color:#f4efeb;background:linear-gradient(135deg,rgba(2,3,4,.96),rgba(44,2,7,.94));border:1px solid rgba(255,255,255,.11);box-shadow:0 18px 38px rgba(0,0,0,.48),0 0 30px rgba(153,4,18,.18);font-family:Arial}.killer-overlay-noise,.killer-overlay-blood{position:absolute;inset:0;pointer-events:none}.killer-overlay-noise{background:repeating-linear-gradient(118deg,rgba(255,255,255,.013) 0 2px,transparent 2px 8px)}.killer-overlay-blood{background:radial-gradient(circle at 88% 12%,rgba(181,8,22,.38),transparent 31%),radial-gradient(circle at 10% 89%,rgba(123,2,11,.22),transparent 25%)}.killer-overlay-card header{position:relative;display:grid;grid-template-columns:185px 1fr 88px;gap:16px;min-height:180px;border-bottom:1px solid rgba(255,255,255,.08)}.killer-overlay-portrait{display:grid;overflow:hidden;place-items:center;background:#030405}.killer-overlay-portrait img{width:100%;height:180px;object-fit:cover}.killer-overlay-portrait svg{width:100px;height:100px}.killer-overlay-title{align-self:center}.killer-overlay-title small{color:#d36c74;font-size:12px;font-weight:900;letter-spacing:.19em}.killer-overlay-title h1{margin:7px 0 3px;font-family:Impact,Arial Black,sans-serif;font-size:47px;letter-spacing:.045em}.killer-overlay-title strong{color:var(--yellow);font-size:18px;letter-spacing:.16em}.killer-style-emblem{display:grid;place-items:center;color:#f3ece7}.killer-style-emblem svg{width:58px;height:58px}.killer-overlay-stats{position:relative;display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid rgba(255,255,255,.07)}.killer-overlay-stats>div{display:grid;grid-template-columns:42px 1fr 34px;gap:6px;align-items:center;min-height:61px;padding:7px 12px;border-right:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.23)}.killer-overlay-stats span{display:grid;place-items:center;width:35px;height:35px;color:white;background:rgba(98,5,13,.32);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}.killer-overlay-stats svg{width:21px;height:21px}.killer-overlay-stats small{color:#aca9a6;font-size:10px;font-weight:900;letter-spacing:.14em}.killer-overlay-stats strong{font-family:Impact,Arial Black,sans-serif;font-size:29px}.killer-overlay-lower{position:relative;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:10px 13px}.killer-special-public{display:grid;grid-template-columns:48px 1fr;gap:8px;align-items:center}.killer-special-public>span{display:grid;width:43px;height:43px;place-items:center;color:#fff;background:#21070b;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}.killer-special-public svg{width:25px;height:25px}.killer-special-public small{display:block;color:#9ca19f;font-size:9px;font-weight:900;letter-spacing:.14em}.killer-special-public strong{display:block;color:#efece7;font-size:14px;letter-spacing:.07em}.killer-special-public em{color:var(--yellow);font-size:10px;font-style:normal}.killer-advantage-glyphs{display:flex;gap:5px}.killer-advantage-glyphs i{display:grid;width:32px;height:32px;place-items:center;color:#ddd;background:#16070a;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}.killer-advantage-glyphs svg{width:18px;height:18px}.killer-overlay-card footer{display:flex;gap:12px;align-items:center;padding:8px 12px;color:#f5d9d9;background:linear-gradient(90deg,#6f0610,#310207);font-size:11px;letter-spacing:.13em}.killer-overlay-card footer span{color:#fff}.killer-overlay-card footer small{margin-left:auto}.killer-overlay-card.is-chasing{animation:killer-card-pulse 1.8s ease-in-out infinite}@keyframes killer-card-pulse{50%{box-shadow:0 18px 38px rgba(0,0,0,.5),0 0 42px rgba(195,15,31,.34)}}.react-attackHit,.react-criticalHit{animation:killer-hit .58s ease!important}@keyframes killer-hit{20%{transform:translateX(-8px) rotate(-.7deg);filter:brightness(1.28)}45%{transform:translateX(7px) rotate(.5deg)}70%{transform:translateX(-3px)}100%{transform:none}}
+/* FX fullscreen */.scene-fx-layer{position:fixed;z-index:999;inset:0;pointer-events:none;overflow:hidden}.fx-vignette,.fx-flash,.fx-blood,.fx-scratches{position:absolute;inset:0;opacity:0}.fx-banner{position:absolute;left:50%;top:11%;display:grid;min-width:420px;gap:5px;padding:14px 35px;opacity:0;color:#fff;background:linear-gradient(90deg,transparent,rgba(9,2,3,.92) 15%,rgba(59,2,7,.92) 82%,transparent);text-align:center;transform:translate(-50%,-18px);font-family:Arial}.fx-banner small{color:#df767d;font-size:11px;font-weight:900;letter-spacing:.25em}.fx-banner strong{font-family:Impact,Arial Black,sans-serif;font-size:44px;letter-spacing:.08em}.fx-banner em{color:#f2c92d;font-size:12px;font-style:normal;letter-spacing:.13em}.scene-fx-layer.is-active .fx-banner{animation:fx-banner 1.8s ease both}.scene-fx-layer.is-active .fx-vignette{animation:fx-vignette 1.9s ease both;background:radial-gradient(circle,transparent 36%,rgba(61,0,7,.72) 100%)}.scene-fx-layer.fx-heavy .fx-flash,.scene-fx-layer.fx-extreme .fx-flash{animation:fx-flash .44s ease both;background:rgba(191,7,21,.34)}.scene-fx-layer.fx-attackHit .fx-blood,.scene-fx-layer.fx-criticalHit .fx-blood,.scene-fx-layer.fx-execution .fx-blood{animation:fx-blood 2.4s ease both;background:radial-gradient(ellipse at 12% 18%,rgba(190,0,16,.82) 0 2%,transparent 16%),radial-gradient(ellipse at 87% 24%,rgba(145,0,12,.76) 0 2%,transparent 17%),radial-gradient(ellipse at 65% 92%,rgba(115,0,9,.7) 0 3%,transparent 20%)}.scene-fx-layer.fx-obstacleBreak .fx-scratches,.scene-fx-layer.fx-dragged .fx-scratches{animation:fx-scratch 1.7s ease both;background:repeating-linear-gradient(105deg,transparent 0 12%,rgba(232,232,226,.22) 12.3% 12.7%,transparent 13% 22%)}@keyframes fx-banner{0%{opacity:0;transform:translate(-50%,-20px) scale(.94)}20%,72%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,8px) scale(1.02)}}@keyframes fx-vignette{0%,100%{opacity:0}18%,70%{opacity:1}}@keyframes fx-flash{0%,100%{opacity:0}25%{opacity:1}}@keyframes fx-blood{0%{opacity:0;transform:scale(.82)}20%,68%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.05)}}@keyframes fx-scratch{0%,100%{opacity:0}20%,70%{opacity:1}}.screen-shake-light{animation:shake-light .28s linear}.screen-shake-heavy{animation:shake-heavy .46s linear}.screen-shake-extreme{animation:shake-extreme .72s linear}@keyframes shake-light{30%{transform:translateX(-2px)}60%{transform:translateX(2px)}}@keyframes shake-heavy{15%{transform:translate(-6px,2px)}35%{transform:translate(6px,-2px)}55%{transform:translate(-4px,1px)}75%{transform:translate(3px,-1px)}}@keyframes shake-extreme{10%{transform:translate(-10px,4px) rotate(-.25deg)}25%{transform:translate(9px,-3px) rotate(.2deg)}42%{transform:translate(-7px,2px)}60%{transform:translate(6px,-2px)}78%{transform:translate(-3px,1px)}}.fx-audio-panel{position:fixed;z-index:1001;top:12px;left:12px;display:grid;gap:2px;padding:9px 12px;border:1px solid rgba(255,255,255,.18);color:white;background:#680710;box-shadow:0 8px 20px rgba(0,0,0,.4);cursor:pointer}.fx-audio-panel strong{font-size:11px;letter-spacing:.15em}.fx-audio-panel small{color:#f5d2d5;font-size:9px}.effects-helper{position:fixed;left:14px;bottom:14px;max-width:360px;padding:10px;color:#b5b8b5;background:rgba(0,0,0,.64);font-family:Arial;font-size:11px}.effects-helper p{margin:0 0 4px;color:#eee;font-weight:900;letter-spacing:.12em}@media(max-width:800px){.assassin-two-col,.killer-advantages{grid-template-columns:1fr}.assassin-card-header{grid-template-columns:90px 1fr}.assassin-card-links{grid-column:1/-1;justify-content:flex-start}.killer-overlay-card{width:620px}}
+
+/* v19 assassin extensions */
+.action-panel-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+.action-panel-grid button small{display:block;opacity:.75;font-size:.72rem;line-height:1.35}
+.killer-advantages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+.killer-advantages button{display:flex;gap:.8rem;align-items:flex-start;text-align:left;padding:.85rem;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff}
+.killer-advantages button span{width:2rem;height:2rem;display:inline-flex;align-items:center;justify-content:center;color:#f1d677}.killer-advantages button span svg{width:100%;height:100%}
+.killer-advantages button small{display:block;color:rgba(255,255,255,.5);font-size:.68rem;letter-spacing:.12em}.killer-advantages button strong{display:block;font-size:.92rem;margin:.15rem 0}.killer-advantages button p{margin:0;font-size:.78rem;color:rgba(255,255,255,.7);line-height:1.35}
+.assassin-picker-item{display:flex;gap:1rem;align-items:flex-start;width:100%;text-align:left;padding:1rem;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:#fff}.assassin-picker-item span{width:2.2rem;height:2.2rem;display:inline-flex;align-items:center;justify-content:center;color:#f1d677}.assassin-picker-item span svg{width:100%;height:100%}.assassin-picker-item h3{margin:0 0 .25rem}.assassin-picker-item p{margin:0;color:rgba(255,255,255,.72);font-size:.85rem;line-height:1.45}.assassin-picker-item small{display:block;color:#f1d677;margin-bottom:.3rem}
+.damage-actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.8rem}.damage-actions .danger{background:rgba(170,36,36,.22);border-color:rgba(255,74,74,.25)}
+@media (max-width: 980px){.action-panel-grid,.killer-advantages{grid-template-columns:1fr}}
+
+/* --- v20: descrições corridas e legíveis nos painéis do assassino --- */
+.show-buttons button,.action-panel-grid button{grid-template-columns:30px minmax(0,1fr)!important;grid-auto-rows:auto;align-items:start;min-width:0;width:100%;white-space:normal;word-break:normal;overflow-wrap:normal}
+.show-buttons button span,.action-panel-grid button span{grid-column:1;grid-row:1 / span 2}
+.show-buttons button strong,.action-panel-grid button strong{grid-column:2;grid-row:1;min-width:0;white-space:normal;word-break:normal;overflow-wrap:normal;line-height:1.25}
+.show-buttons button small,.action-panel-grid button small{grid-column:2;grid-row:2;display:block;min-width:0;width:auto!important;max-width:none!important;white-space:normal;word-break:normal;overflow-wrap:normal;line-height:1.42;margin-top:.2rem}
+.killer-advantages button p,.assassin-picker-item p,.selected-special p{white-space:normal;word-break:normal;overflow-wrap:normal;line-height:1.45}
+
+/* --- v24: transições de VFX mais longas e suaves para leitura --- */
+.scene-fx-layer.is-active .fx-banner{animation:fx-banner-long 5s ease both!important}
+.scene-fx-layer.is-active .fx-vignette{animation:fx-vignette-long 5s ease both!important}
+.scene-fx-layer.fx-heavy .fx-flash,.scene-fx-layer.fx-extreme .fx-flash{animation:fx-flash-long .9s ease both!important}
+.scene-fx-layer.fx-attackHit .fx-blood,.scene-fx-layer.fx-criticalHit .fx-blood,.scene-fx-layer.fx-execution .fx-blood{animation:fx-blood-long 5s ease both!important}
+.scene-fx-layer.fx-obstacleBreak .fx-scratches,.scene-fx-layer.fx-dragged .fx-scratches{animation:fx-scratch-long 5s ease both!important}
+.scene-fx-layer.is-fading .fx-banner,.scene-fx-layer.is-fading .fx-vignette,.scene-fx-layer.is-fading .fx-flash,.scene-fx-layer.is-fading .fx-blood,.scene-fx-layer.is-fading .fx-scratches{animation:fx-soft-out .7s ease forwards!important}
+@keyframes fx-banner-long{0%{opacity:0;transform:translate(-50%,-20px) scale(.94)}10%,80%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,10px) scale(1.01)}}
+@keyframes fx-vignette-long{0%,100%{opacity:0}10%,82%{opacity:1}}
+@keyframes fx-flash-long{0%,100%{opacity:0}22%{opacity:.95}60%{opacity:.18}}
+@keyframes fx-blood-long{0%{opacity:0;transform:scale(.82)}12%,78%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.04)}}
+@keyframes fx-scratch-long{0%,100%{opacity:0}12%,80%{opacity:1}}
+@keyframes fx-soft-out{from{opacity:1}to{opacity:0}}
+
+/* --- v26: avisos direcionados, descrição legível e fade único --- */
+.fx-banner{
+  min-width:min(680px,calc(100vw - 48px));
+  max-width:min(860px,calc(100vw - 48px));
+  padding:18px 42px 20px;
+}
+.fx-banner p{
+  display:none;
+  max-width:720px;
+  margin:2px auto 1px;
+  color:rgba(255,255,255,.92);
+  font-family:Arial,sans-serif;
+  font-size:15px;
+  font-weight:700;
+  line-height:1.42;
+  letter-spacing:.025em;
+  text-wrap:balance;
+}
+.fx-banner.has-description p{
+  display:block;
+}
+.scene-fx-layer.is-active .fx-banner{
+  animation:fx-banner-readable 4.3s ease both!important;
+}
+.scene-fx-layer.is-active .fx-vignette{
+  animation:fx-vignette-readable 4.3s ease both!important;
+}
+.scene-fx-layer.fx-heavy.is-active .fx-flash,
+.scene-fx-layer.fx-extreme.is-active .fx-flash{
+  animation:fx-flash-readable .9s ease both!important;
+}
+.scene-fx-layer.fx-attackHit.is-active .fx-blood,
+.scene-fx-layer.fx-criticalHit.is-active .fx-blood,
+.scene-fx-layer.fx-execution.is-active .fx-blood{
+  animation:fx-blood-readable 4.3s ease both!important;
+}
+.scene-fx-layer.fx-obstacleBreak.is-active .fx-scratches,
+.scene-fx-layer.fx-dragged.is-active .fx-scratches{
+  animation:fx-scratch-readable 4.3s ease both!important;
+}
+.scene-fx-layer.is-fading .fx-banner,
+.scene-fx-layer.is-fading .fx-vignette,
+.scene-fx-layer.is-fading .fx-flash,
+.scene-fx-layer.is-fading .fx-blood,
+.scene-fx-layer.is-fading .fx-scratches{
+  animation:fx-soft-out-once .7s ease forwards!important;
+}
+@keyframes fx-banner-readable{
+  0%{opacity:0;transform:translate(-50%,-18px) scale(.96)}
+  12%,100%{opacity:1;transform:translate(-50%,0) scale(1)}
+}
+@keyframes fx-vignette-readable{
+  0%{opacity:0}
+  14%,100%{opacity:1}
+}
+@keyframes fx-flash-readable{
+  0%,100%{opacity:0}
+  25%{opacity:.95}
+  62%{opacity:.14}
+}
+@keyframes fx-blood-readable{
+  0%{opacity:0;transform:scale(.84)}
+  15%,100%{opacity:1;transform:scale(1)}
+}
+@keyframes fx-scratch-readable{
+  0%{opacity:0}
+  16%,100%{opacity:1}
+}
+@keyframes fx-soft-out-once{
+  from{opacity:1}
+  to{opacity:0}
+}
+@media(max-width:720px){
+  .fx-banner{
+    min-width:calc(100vw - 24px);
+    max-width:calc(100vw - 24px);
+    padding:14px 18px 16px;
+  }
+  .fx-banner strong{font-size:34px}
+  .fx-banner p{font-size:13px}
+}
+
+/* --- v27: fade final controlado pelo contêiner, sem reinício visual --- */
+.scene-fx-layer{
+  opacity:0;
+}
+.scene-fx-layer.fx-reset,
+.scene-fx-layer.is-fading{
+  pointer-events:none;
+}
+.scene-fx-layer.is-active .fx-banner{
+  animation:fx-banner-enter-only .52s ease-out both!important;
+}
+.scene-fx-layer.is-active .fx-vignette{
+  animation:fx-vignette-enter-only .58s ease-out both!important;
+}
+.scene-fx-layer.fx-heavy.is-active .fx-flash,
+.scene-fx-layer.fx-extreme.is-active .fx-flash{
+  animation:fx-flash-enter-only .9s ease-out both!important;
+}
+.scene-fx-layer.fx-attackHit.is-active .fx-blood,
+.scene-fx-layer.fx-criticalHit.is-active .fx-blood,
+.scene-fx-layer.fx-execution.is-active .fx-blood{
+  animation:fx-blood-enter-only .7s ease-out both!important;
+}
+.scene-fx-layer.fx-obstacleBreak.is-active .fx-scratches,
+.scene-fx-layer.fx-dragged.is-active .fx-scratches{
+  animation:fx-scratch-enter-only .7s ease-out both!important;
+}
+.scene-fx-layer.is-fading .fx-banner,
+.scene-fx-layer.is-fading .fx-vignette,
+.scene-fx-layer.is-fading .fx-blood,
+.scene-fx-layer.is-fading .fx-scratches{
+  animation:none!important;
+  opacity:1!important;
+}
+.scene-fx-layer.is-fading .fx-flash{
+  animation:none!important;
+  opacity:0!important;
+}
+@keyframes fx-banner-enter-only{
+  0%{opacity:0;transform:translate(-50%,-18px) scale(.96)}
+  100%{opacity:1;transform:translate(-50%,0) scale(1)}
+}
+@keyframes fx-vignette-enter-only{
+  0%{opacity:0}
+  100%{opacity:1}
+}
+@keyframes fx-flash-enter-only{
+  0%{opacity:0}
+  26%{opacity:.95}
+  100%{opacity:0}
+}
+@keyframes fx-blood-enter-only{
+  0%{opacity:0;transform:scale(.84)}
+  100%{opacity:1;transform:scale(1)}
+}
+@keyframes fx-scratch-enter-only{
+  0%{opacity:0}
+  100%{opacity:1}
+}
+
+/* --- v44: estética VHS coerente para painel do mestre / assassinos --- */
+:root{--vhs-line:rgba(120,215,255,.18);--vhs-line-strong:rgba(130,233,255,.34);--vhs-cyan:#7be9ff;--vhs-blue:#2a61ff;--vhs-bg:#04070b}
+body.assassin-master-page{
+  position:relative;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(34,91,255,.16), transparent 26rem),
+    radial-gradient(circle at 91% 11%, rgba(255,0,90,.10), transparent 22rem),
+    linear-gradient(180deg, #04070b 0%, #09111a 56%, #05090d 100%)!important;
+}
+body.assassin-master-page::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.035) 0 1px, transparent 1px 3px),linear-gradient(90deg, rgba(0,140,255,.06), transparent 32%, transparent 68%, rgba(255,0,90,.04));
+  mix-blend-mode:screen;opacity:.16;
+}
+body.assassin-master-page::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at center, transparent 58%, rgba(0,0,0,.3) 100%);
+}
+.assassin-master-shell,.assassin-overlay-root{position:relative;z-index:1}
+.assassin-master-hero,.assassin-create,.assassin-control-card,.assassin-panel,.assassin-empty{
+  border:1px solid var(--vhs-line-strong)!important;
+  border-radius:22px!important;
+  background:linear-gradient(180deg, rgba(14,25,38,.92), rgba(6,11,18,.92))!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.03)!important;
+  backdrop-filter:blur(6px);
+}
+.assassin-master-hero h1,.assassin-style-row h3,.assassin-card-title strong,.killer-stat strong,.assassin-picker-item h3,.killer-overlay-title h1{
+  font-family:"Arial Black", Impact, Arial, sans-serif!important;
+  text-transform:uppercase;
+  letter-spacing:.04em!important;
+}
+.assassin-master-hero p,.assassin-style-row p,.muted,.selected-special p,.assassin-picker-item p,.killer-advantages p,.effects-helper,.killer-special-public p{color:rgba(233,242,250,.76)!important}
+.assassin-master-hero a,.assassin-card-links button,.assassin-card-footer a,.assassin-card-footer button,.assassin-panel button,.assassin-style-row button,.killer-stat-actions button,.show-buttons button,.damage-actions button,.action-panel-grid button,.killer-advantages button,.assassin-picker-item{
+  border-radius:12px!important;
+  border:1px solid var(--vhs-line-strong)!important;
+  background:linear-gradient(180deg, rgba(42,97,255,.30), rgba(11,22,44,.82))!important;
+  color:#f6fbff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 22px rgba(0,0,0,.28)!important;
+}
+.assassin-name-input,.chase-grid select,.chase-grid input{
+  border-radius:12px!important;border:1px solid rgba(123,233,255,.18)!important;background:linear-gradient(180deg, rgba(7,12,20,.92), rgba(6,10,16,.78))!important;color:#f3fbff!important;
+}
+.killer-stat,.assassin-style-row,.assassin-card-header,.killer-overlay-stats>div,.killer-overlay-lower,.killer-advantages button,.assassin-picker-item,.show-panel{
+  background-color:rgba(255,255,255,.035)!important;
+}
+.killer-stat-icon,.selected-special>span,.killer-advantages span,.assassin-picker-item span,.killer-overlay-stats span,.killer-special-public>span{
+  box-shadow:inset 0 0 0 1px rgba(123,233,255,.14), 0 0 14px rgba(0,0,0,.18);
+}
+.killer-overlay-card{
+  border:1px solid rgba(123,233,255,.14)!important;
+  box-shadow:0 24px 65px rgba(0,0,0,.45), 0 0 0 1px rgba(123,233,255,.06) inset!important;
+}
+.effects-helper,.fx-audio-panel{
+  border:1px solid rgba(123,233,255,.22)!important;
+  background:linear-gradient(180deg, rgba(16,28,45,.86), rgba(6,12,20,.92))!important;
+}

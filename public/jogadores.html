@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050607" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>Uma Noite no Inferno — Jogadores</title>
+  <link rel="stylesheet" href="/style.css?v=61" />
+</head>
+<body class="player-select-page lite-page">
+  <main class="player-select-shell">
+    <header class="player-select-header">
+      <div>
+        <p class="eyebrow">PAINEL DE JOGADOR</p>
+        <h1><a class="title-link" href="https://online.anyflip.com/obrff/nsjc/mobile/index.html" target="_blank" rel="noopener">ALÉM DA <span>NÉVOA</span></a></h1>
+        <p>Escolha um personagem criado para abrir a ficha individual ou o overlay correspondente.</p>
+      </div>
+      <nav class="player-select-nav">
+        <a href="/">CENTRAL</a>
+        <a href="/mestre">MESTRE</a>
+        <a href="/overlay" target="_blank">OVERLAY GERAL</a>
+      </nav>
+    </header>
+    <section id="players-grid" class="players-grid">
+      <article class="players-empty">Carregando personagens...</article>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/player-catalog.js?v=61"></script>
+  <script src="/common.js?v=61"></script>
+  <script src="/jogadores.js?v=61"></script>
+</body>
+</html>

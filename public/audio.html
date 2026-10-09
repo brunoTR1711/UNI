@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050607" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>Uma Noite no Inferno — Áudio da transmissão</title>
+  <link rel="stylesheet" href="/style.css?v=61" />
+</head>
+<body class="stream-audio-page">
+  <main class="stream-audio-shell">
+    <section class="stream-audio-card">
+      <p class="eyebrow">FONTE EXCLUSIVA PARA O MIXER DO OBS</p>
+      <h1>ÁUDIO DA TRANSMISSÃO</h1>
+
+      <div class="audio-diagnostic-grid">
+        <span>CONEXÃO</span><strong id="audio-connection">CONECTANDO...</strong>
+        <span>MOTOR</span><strong id="audio-engine">AGUARDANDO</strong>
+        <span>ARQUIVOS</span><strong id="audio-loaded">0 / 0</strong>
+        <span>ÚLTIMO EVENTO</span><strong id="audio-last-event">NENHUM</strong>
+      </div>
+
+      <p id="audio-status">
+        Use a opção <strong>Interagir</strong> do OBS e clique uma vez em ativar.
+      </p>
+
+      <div class="audio-action-grid">
+        <button id="enable-stream-audio" class="primary-button" type="button">ATIVAR ÁUDIO DO OBS</button>
+        <button id="test-gain" class="secondary-button" type="button">TESTAR + PONTO</button>
+        <button id="test-loss" class="secondary-button" type="button">TESTAR − PONTO</button>
+        <button id="test-damage" class="secondary-button" type="button">TESTAR DANO</button>
+        <button id="test-dice" class="secondary-button" type="button">TESTAR DADO</button>
+      </div>
+
+      <small>
+        Mantenha esta fonte ativa. No OBS, marque “Controlar áudio pelo OBS” e deixe desativada a opção de desligar a fonte quando ela não estiver visível.
+      </small>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/audio.js?v=61"></script>
+  <script src="/stream-audio.js?v=61"></script>
+</body>
+</html>
