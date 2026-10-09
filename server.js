@@ -7,11 +7,19 @@ const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { maxHttpBufferSize: 16 * 1024 * 1024 });
+const io = new Server(server, {
+  maxHttpBufferSize: 16 * 1024 * 1024,
+  perMessageDeflate: { threshold: 1024 },
+  pingInterval: 25000,
+  pingTimeout: 20000
+});
 const PORT = Number(process.env.PORT || 3000);
 const DATA_DIR = path.join(__dirname, "data");
 const DATA_PATH = path.join(DATA_DIR, "state.json");
-const APP_VERSION = "v62-estilos";
+const PUBLIC_DIR = path.join(__dirname, "public");
+const UPLOADS_DIR = path.join(PUBLIC_DIR, "uploads");
+const PORTRAIT_DIR = path.join(UPLOADS_DIR, "portraits");
+const APP_VERSION = "v63-performance";
 const DICE_ANIMATION_MS = 3000;
 app.disable("etag");
 app.use(express.json({ limit: "16mb" }));
@@ -22,7 +30,7 @@ app.use((req, res, next) => {
   res.setHeader("X-Uma-Noite-Version", APP_VERSION);
   next();
 });
-app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0, lastModified: false }));
+app.use(express.static(PUBLIC_DIR, { etag: false, maxAge: 0, lastModified: false }));
 
 const ALLOWED_THEME_PRESETS = new Set(["ciano", "magenta", "ambar", "verde", "violeta", "laranja", "azul"]);
 
@@ -106,13 +114,41 @@ function loadState() {
 }
 
 let state = loadState();
+let stateDataMigrated = false;
 let audioSequence = 0;
 let sceneSequence = 0;
 
-function saveState() {
+let saveTimer = null;
+function persistStateNow() {
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
   state.updatedAt = Date.now();
+  fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(DATA_PATH, JSON.stringify(state, null, 2), "utf8");
 }
+function saveState({ immediate = false } = {}) {
+  state.updatedAt = Date.now();
+  if (immediate) {
+    persistStateNow();
+    return;
+  }
+  if (saveTimer) return;
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFile(DATA_PATH, JSON.stringify(state, null, 2), "utf8", (error) => {
+      if (error) console.error("Falha ao salvar estado:", error);
+    });
+  }, 120);
+}
+process.once("SIGINT", () => {
+  try { persistStateNow(); } finally { process.exit(0); }
+});
+process.once("SIGTERM", () => {
+  try { persistStateNow(); } finally { process.exit(0); }
+});
 function getLocalIps() {
   return Object.values(os.networkInterfaces())
     .flat()
@@ -130,6 +166,31 @@ function sanitizeId(v) {
     .replace(/^-|-$/g, "")
     .slice(0, 40);
 }
+
+function dataUrlToPortraitFile(characterId, portraitKey, value) {
+  if (typeof value !== "string" || !value.startsWith("data:image/")) return value || "";
+  const match = value.match(/^data:(image\/(png|jpeg|jpg|webp));base64,(.+)$/);
+  if (!match) return "";
+  const mime = match[1];
+  const ext = mime.includes("jpeg") || mime.includes("jpg") ? "jpg" : match[2];
+  const safeId = sanitizeId(characterId) || "personagem";
+  const safeKey = sanitizeId(portraitKey) || "retrato";
+  const version = Date.now().toString(36);
+  const filename = `${safeId}-${safeKey}-${version}.${ext}`;
+  fs.mkdirSync(PORTRAIT_DIR, { recursive: true });
+  fs.writeFileSync(path.join(PORTRAIT_DIR, filename), Buffer.from(match[3], "base64"));
+  stateDataMigrated = true;
+  return `/uploads/portraits/${filename}`;
+}
+
+function normalizePortraits(id, portraits = {}) {
+  const result = {};
+  for (const key of ["saudavel", "ferido", "machucado", "morrendo", "morto"]) {
+    result[key] = dataUrlToPortraitFile(id, key, portraits[key] || "");
+  }
+  return result;
+}
+
 function calculateCondition(marked, dead = false) {
   if (dead) return "morto";
   if (marked <= 0) return "saudavel";
@@ -233,7 +294,7 @@ function normalizeCharacter(character, id) {
   const base = defaultCharacter(id);
   const result = { ...base, ...(character || {}) };
   result.id = id;
-  result.portraits = { ...base.portraits, ...(character?.portraits || {}) };
+  result.portraits = normalizePortraits(id, { ...base.portraits, ...(character?.portraits || {}) });
   result.styleStats = { ...base.styleStats, ...(character?.styleStats || {}) };
   const resolvedStyleKey = LEGACY_SURVIVOR_STYLE_MAP[result.styleKey] || result.styleKey;
   const resolvedStyle = SURVIVOR_STYLES[resolvedStyleKey];
@@ -265,6 +326,7 @@ function normalizeAssassin(assassin, id) {
   const base = defaultAssassin(id);
   const result = { ...base, ...(assassin || {}) };
   result.id = id;
+  result.portrait = dataUrlToPortraitFile(id, "assassino", result.portrait || "");
   result.bloodlust = { ...base.bloodlust, ...(assassin?.bloodlust || {}) };
   result.chase = { ...base.chase, ...(assassin?.chase || {}) };
   result.advantages = Array.isArray(assassin?.advantages) ? assassin.advantages.slice(0, 3) : [null, null, null];
@@ -282,6 +344,7 @@ function normalizeState() {
   for (const id of Object.keys(state.assassins)) state.assassins[id] = normalizeAssassin(state.assassins[id], id);
 }
 normalizeState();
+if (stateDataMigrated) persistStateNow();
 
 function ensureCharacter(id) {
   id = sanitizeId(id);
@@ -404,7 +467,7 @@ app.get("/assassino/overlay/:id", (_, res) => res.sendFile(path.join(__dirname, 
 app.get("/efeitos", (_, res) => res.sendFile(path.join(__dirname, "public", "effects.html")));
 app.get("/efeitos/:id", (_, res) => res.sendFile(path.join(__dirname, "public", "effects.html")));
 app.get("/api/state", (_, res) => res.json(state));
-app.get("/api/network", (_, res) => res.json({ port: PORT, ips: getLocalIps() }));
+app.get("/api/network", (_, res) => res.json({ version: APP_VERSION, port: PORT, ips: getLocalIps() }));
 
 io.on("connection", (socket) => {
   socket.emit("state:update", state);
@@ -435,7 +498,7 @@ io.on("connection", (socket) => {
   socket.on("character:updatePortrait", ({ id, key, dataUrl, role = "player" }) => {
     const character = ensureCharacter(id);
     if (!character || !canPlayerEdit(character, role) || !(key in character.portraits) || typeof dataUrl !== "string" || dataUrl.length > 10000000) return;
-    character.portraits[key] = dataUrl;
+    character.portraits[key] = dataUrlToPortraitFile(character.id, key, dataUrl);
     emitState();
   });
   socket.on("character:setMarks", ({ id, marcasEstado, role = "player" }) => {
@@ -641,7 +704,7 @@ io.on("connection", (socket) => {
   socket.on("assassin:updatePortrait", ({ id, dataUrl }) => {
     const assassin = ensureAssassin(id);
     if (!assassin || typeof dataUrl !== "string" || dataUrl.length > 10000000) return;
-    assassin.portrait = dataUrl;
+    assassin.portrait = dataUrlToPortraitFile(assassin.id, "assassino", dataUrl);
     emitState();
   });
   socket.on("assassin:setResource", ({ id, resource, value }) => {

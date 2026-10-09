@@ -1,5 +1,7 @@
 {
-  "version": "v62-estilos-oficiais",
+  "version": "v63-performance",
   "name": "Uma Noite no Inferno VTT",
-  "notes": "Substitui a lista de Estilos pela lista oficial enviada nas imagens: Escapista, Protetor, Rebelde, Reservado, Curioso, Guia, Místico, Resiliente, Gênio, Artista e Amigável."
+  "notes": "Substitui a lista de Estilos pela lista oficial enviada nas imagens: Escapista, Protetor, Rebelde, Reservado, Curioso, Guia, Místico, Resiliente, Gênio, Artista e Amigável.",
+  "build": "2026-10-09",
+  "descricao": "Otimização de resposta: retratos salvos como arquivos, estado menor e salvamento assíncrono/debounce para PC/Android/Tailscale."
 }
