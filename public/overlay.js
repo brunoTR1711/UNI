@@ -73,7 +73,7 @@ function setDiceTargetState(target, value, final = false) {
     target.classList.add('dice-rolling');
     target.classList.remove('dice-revealed');
     container?.classList.add('rolling');
-    if (label) label.textContent = 'ROLANDO';
+    if (label) label.textContent = '';
   }
 }
 function applyDiceServerFrame(key, value, final = false) {
@@ -375,7 +375,7 @@ function makeLatestRoll(character) {
     <div class="sheet-d20-content overlay-sheet-d20-content">
       <span class="sheet-d20-icon">${RESOURCE_ICON[latest.resource]}</span>
       <strong class="dice-result dice-overlay-result" data-client-roll-key="${escapeHtml(latest.key)}" data-roll-at="${latest.roll.at}" data-reveal-at="${latest.roll.revealAt || latest.roll.at}" data-final-value="${latest.roll.value}">${visibleValue}</strong>
-      <em>${isRolling ? 'ROLANDO' : ''}</em>
+      <em>${isRolling ? '' : ''}</em>
     </div>
   </div>`;
 }
@@ -408,7 +408,7 @@ function animateDiceResults(container) {
     const initialPopup = element.closest('.vhs-roll-popup-d20');
     initialPopup?.classList.add('rolling');
     const initialLabel = initialPopup?.querySelector('em');
-    if (initialLabel) initialLabel.textContent = 'ROLANDO';
+    if (initialLabel) initialLabel.textContent = '';
     element.textContent = String(Math.floor(Math.random() * 20) + 1);
     if (diceTimers.has(key)) return;
     timer = setInterval(() => {
@@ -419,7 +419,7 @@ function animateDiceResults(container) {
         const popup = target.closest('.vhs-roll-popup-d20');
         popup?.classList.add('rolling');
         const label = popup?.querySelector('em');
-        if (label) label.textContent = 'ROLANDO';
+        if (label) label.textContent = '';
       });
       if (performance.now() >= timing.revealAt) {
         clearInterval(timer);
