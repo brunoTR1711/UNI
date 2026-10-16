@@ -67,7 +67,7 @@ function setDiceTargetState(target, value, final = false) {
     target.classList.remove('dice-rolling');
     target.classList.add('dice-revealed');
     container?.classList.remove('rolling');
-    if (label) label.textContent = 'RESULTADO';
+    if (label) label.textContent = '';
     setTimeout(() => target.classList.remove('dice-revealed'), 620);
   } else {
     target.classList.add('dice-rolling');
@@ -375,7 +375,7 @@ function makeLatestRoll(character) {
     <div class="sheet-d20-content overlay-sheet-d20-content">
       <span class="sheet-d20-icon">${RESOURCE_ICON[latest.resource]}</span>
       <strong class="dice-result dice-overlay-result" data-client-roll-key="${escapeHtml(latest.key)}" data-roll-at="${latest.roll.at}" data-reveal-at="${latest.roll.revealAt || latest.roll.at}" data-final-value="${latest.roll.value}">${visibleValue}</strong>
-      <em>${isRolling ? 'ROLANDO' : 'RESULTADO'}</em>
+      <em>${isRolling ? 'ROLANDO' : ''}</em>
     </div>
   </div>`;
 }
@@ -399,7 +399,7 @@ function animateDiceResults(container) {
         const popup = target.closest('.vhs-roll-popup-d20');
         popup?.classList.remove('rolling');
         const label = popup?.querySelector('em');
-        if (label) label.textContent = 'RESULTADO';
+        if (label) label.textContent = '';
         setTimeout(() => target.classList.remove("dice-revealed"), 620);
       });
     };

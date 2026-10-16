@@ -79,13 +79,13 @@ function setDiceTargetState(target, value, final = false) {
     target.classList.remove('dice-rolling');
     target.classList.add('dice-revealed');
     container?.classList.remove('rolling');
-    if (label) label.textContent = 'RESULTADO';
+    if (label) label.textContent = '';
     setTimeout(() => target.classList.remove('dice-revealed'), 620);
   } else {
     target.classList.add('dice-rolling');
     target.classList.remove('dice-revealed');
     container?.classList.add('rolling');
-    if (label) label.textContent = 'ROLANDO';
+    if (label) label.textContent = '';
   }
 }
 function applyDiceServerFrame(key, value, final = false) {
@@ -303,13 +303,13 @@ function renderItemsCompact() {
 function renderLatestRollPanel() {
   const latest = getLatestRollData();
   if (!latest) {
-    return `<section class="vhs-card vhs-roll-panel empty"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display idle"><img src="/context_assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON.foco}</span><strong>—</strong><em>SEM ROLAGEM</em></div></div></section>`;
+    return `<section class="vhs-card vhs-roll-panel empty"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display idle"><img src="/context_assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON.foco}</span><strong>—</strong><em></em></div></div></section>`;
   }
   const roll = latest.roll;
   const rollKey = makeClientRollKey(id, latest.resource, roll);
   const isRolling = isClientRollRolling(rollKey);
   const visibleValue = getDiceDisplayValue(rollKey, roll.value);
-  return `<section class="vhs-card vhs-roll-panel"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display ${isRolling ? 'rolling' : ''}"><img src="/context_assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON[latest.resource]}</span><strong class="dice-result" data-client-roll-key="${escapeHtml(rollKey)}" data-roll-at="${roll.at}" data-reveal-at="${roll.revealAt || roll.at}" data-final-value="${roll.value}">${visibleValue}</strong><em>${isRolling ? 'ROLANDO' : 'RESULTADO'}</em></div></div></section>`;
+  return `<section class="vhs-card vhs-roll-panel"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display ${isRolling ? 'rolling' : ''}"><img src="/context_assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON[latest.resource]}</span><strong class="dice-result" data-client-roll-key="${escapeHtml(rollKey)}" data-roll-at="${roll.at}" data-reveal-at="${roll.revealAt || roll.at}" data-final-value="${roll.value}">${visibleValue}</strong><em>${isRolling ? 'ROLANDO' : ''}</em></div></div></section>`;
 }
 function renderAttributeStatePanel() {
   return `
@@ -472,7 +472,7 @@ function animateDiceResults(container) {
         const display = target.closest('.sheet-d20-display');
         display?.classList.remove('rolling');
         const label = display?.querySelector('em');
-        if (label) label.textContent = 'RESULTADO';
+        if (label) label.textContent = '';
         setTimeout(() => target.classList.remove("dice-revealed"), 620);
       });
     };
@@ -481,7 +481,7 @@ function animateDiceResults(container) {
     const display = element.closest('.sheet-d20-display');
     display?.classList.add('rolling');
     const label = display?.querySelector('em');
-    if (label) label.textContent = 'ROLANDO';
+    if (label) label.textContent = '';
     element.textContent = String(Math.floor(Math.random() * 20) + 1);
     if (diceTimers.has(key)) return;
     timer = setInterval(() => {
@@ -492,7 +492,7 @@ function animateDiceResults(container) {
         const display = target.closest('.sheet-d20-display');
         display?.classList.add('rolling');
         const label = display?.querySelector('em');
-        if (label) label.textContent = 'ROLANDO';
+        if (label) label.textContent = '';
       });
       if (performance.now() >= timing.revealAt) {
         clearInterval(timer);
