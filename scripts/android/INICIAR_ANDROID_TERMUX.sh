@@ -1,5 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -e
+cd -- "$(dirname -- "$0")/../.."
 clear
 printf '\n=== UMA NOITE NO INFERNO — SERVIDOR NO ANDROID ===\n\n'
 termux-wake-lock 2>/dev/null || true

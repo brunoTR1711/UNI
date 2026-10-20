@@ -1,5 +1,11 @@
 (function(){
-  const socket = io();
+  const socket = window.nevoaSocket || (window.nevoaSocket = io({ autoConnect: false }));
+  // Attach the overlay's listeners before the server sends its initial snapshot.
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => socket.connect(), { once: true });
+  } else {
+    socket.connect();
+  }
   const path = location.pathname;
   const idFromPath = () => path.split('/').filter(Boolean).at(-1) || '';
   const filterId = idFromPath();

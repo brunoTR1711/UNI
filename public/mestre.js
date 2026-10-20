@@ -1,4 +1,4 @@
-const socket = io();
+const socket = window.nevoaSocket || (window.nevoaSocket = io());
 const Common = window.NevoaCommon;
 const CAT = window.NEVOA_PLAYER_CATALOG;
 const ACAT = window.NEVOA_ASSASSIN_CATALOG || { svg: {}, abilities: [], advantages: [] };
@@ -37,65 +37,20 @@ let state = { characters: {}, assassins: {} };
 let threatEnsured = false;
 const seenRolls = new Set();
 const rollHistory = [];
+const renderedCards = new Map();
 const diceTimers = new Map();
-const diceLocalTimings = new Map();
-const diceServerFrames = new Map();
-const CLIENT_DICE_ANIMATION_MS = 3000;
-const CLIENT_DICE_VISIBLE_MS = 11000;
-function makeClientRollKey(characterId, resource, roll) {
-  return roll?.id || roll?.key || `${characterId || "local"}:${resource || "roll"}:${roll?.at || 0}:${roll?.value || 0}`;
-}
-function getClientRollTiming(key) {
-  let timing = diceLocalTimings.get(key);
-  if (!timing) {
-    const now = performance.now();
-    timing = { startedAt: now, revealAt: now + CLIENT_DICE_ANIMATION_MS, hideAt: now + CLIENT_DICE_VISIBLE_MS };
-    diceLocalTimings.set(key, timing);
-  }
-  return timing;
-}
-function primeClientRollTiming(key) {
-  const now = performance.now();
-  diceLocalTimings.set(key, { startedAt: now, revealAt: now + CLIENT_DICE_ANIMATION_MS, hideAt: now + CLIENT_DICE_VISIBLE_MS });
-}
-function isClientRollRolling(key) {
-  return performance.now() < getClientRollTiming(key).revealAt;
-}
-function isClientRollVisible(key) {
-  return performance.now() < getClientRollTiming(key).hideAt;
-}
-function getDiceDisplayValue(key, finalValue) {
-  const frame = diceServerFrames.get(key);
-  if (frame && !frame.final) return String(frame.value);
-  if (frame && frame.final) return String(finalValue);
-  return isClientRollRolling(key) ? String(Math.floor(Math.random() * 20) + 1) : String(finalValue);
-}
-function setDiceTargetState(target, value, final = false) {
-  target.textContent = String(value);
-  const d20Display = target.closest('.sheet-d20-display');
-  const popup = target.closest('.vhs-roll-popup-d20');
-  const container = popup || d20Display;
-  const label = container?.querySelector('em');
-  if (final) {
-    target.classList.remove('dice-rolling');
-    target.classList.add('dice-revealed');
-    container?.classList.remove('rolling');
-    if (label) label.textContent = 'RESULTADO';
-    setTimeout(() => target.classList.remove('dice-revealed'), 620);
-  } else {
-    target.classList.add('dice-rolling');
-    target.classList.remove('dice-revealed');
-    container?.classList.add('rolling');
-    if (label) label.textContent = 'ROLANDO';
-  }
-}
-function applyDiceServerFrame(key, value, final = false) {
-  if (!key || !Number.isFinite(Number(value))) return;
-  diceServerFrames.set(key, { value: Number(value), final: !!final });
-  document.querySelectorAll(`.dice-result[data-client-roll-key="${key}"]`).forEach((target) => {
-    setDiceTargetState(target, Number(value), !!final);
-  });
-}
+const {
+  diceLocalTimings,
+  diceServerFrames,
+  CLIENT_DICE_ANIMATION_MS,
+  makeClientRollKey,
+  getClientRollTiming,
+  primeClientRollTiming,
+  isClientRollRolling,
+  isClientRollVisible,
+  getDiceDisplayValue,
+  applyDiceServerFrame
+} = window.NevoaCommon.createDiceController({ showLabels: true });
 let killerPickerMode = null;
 let killerPickerSlot = 0;
 
@@ -151,9 +106,6 @@ function ensureThreat() {
   if (threatEnsured || state.assassins?.[THREAT_ID]) return;
   threatEnsured = true;
   socket.emit("assassin:create", { id: THREAT_ID, nome: "Ameaça do Inferno" });
-}
-function getStyle(character) {
-  return CAT.styles.find((entry) => entry.key === character?.styleKey) || null;
 }
 function trackRolls() {
   chars().forEach((character) => {
@@ -318,16 +270,6 @@ function renderRollHistory() {
     </article>
   `).join("");
 }
-function renderEffects(character) {
-  const effects = Array.isArray(character.effects) ? character.effects : [];
-  if (!effects.length) return `<p class="lite-empty">Sem efeitos.</p>`;
-  return `<div class="lite-master-effects">${effects.map((effect) => `
-    <span class="effect-mini ${effect.negative === false ? "positive" : ""}">
-      <span class="catalog-icon">${svg(effect.icon)}</span>${escapeHtml(effect.nome)}
-      <button type="button" data-action="remove-effect" data-id="${escapeHtml(character.id)}" data-effect="${escapeHtml(effect.key)}">×</button>
-    </span>
-  `).join("")}</div>`;
-}
 function conditionStripClass(character) {
   const count = Array.isArray(character.effects) ? character.effects.length : 0;
   return `master-vhs-condition-strip ${count >= 4 ? "split" : "vertical"}`;
@@ -338,25 +280,6 @@ function renderConditionGlyphs(character) {
   return effects.map((effect) => `
     <button type="button" class="master-cond-icon ${effect.negative === false ? "positive" : ""}" title="${escapeHtml(effect.nome)}" data-action="remove-effect" data-id="${escapeHtml(character.id)}" data-effect="${escapeHtml(effect.key)}">${svg(effect.icon)}</button>
   `).join("");
-}
-function renderStyleStats(style) {
-  const stats = style?.stats || { cooperacao: 0, folego: 0, foco: 0 };
-  return `<span class="lite-master-style-stats">${RESOURCE_ICON.cooperacao} ${Number(stats.cooperacao || 0)} · ${RESOURCE_ICON.folego} ${Number(stats.folego || 0)} · ${RESOURCE_ICON.foco} ${Number(stats.foco || 0)}</span>`;
-}
-function renderStyle(character) {
-  const style = getStyle(character);
-  if (!style) return `<span class="lite-empty inline">sem estilo</span>`;
-  return `<span class="lite-master-style-pill"><span class="catalog-icon">${svg(style.icon)}</span><strong>${escapeHtml(style.nome)}</strong>${renderStyleStats(style)}</span>`;
-}
-function renderAdvantages(character) {
-  const advantages = Array.isArray(character.vantagens) ? character.vantagens.filter(Boolean) : [];
-  if (!advantages.length) return `<span class="lite-empty inline">sem vantagens</span>`;
-  return advantages.map((advantage) => `<span class="lite-master-advantage"><span class="catalog-icon">${svg(advantage.icon)}</span>${escapeHtml(advantage.nome)}</span>`).join("");
-}
-function renderItems(character) {
-  const items = Array.isArray(character.items) ? character.items.filter(Boolean) : [];
-  if (!items.length) return `<span class="lite-empty inline">sem itens</span>`;
-  return items.map((item) => `<span class="lite-master-item"><span class="catalog-icon">${svg(item.icon)}</span>${escapeHtml(item.nome)} ${item.max > 0 ? `×${item.charges}` : ""}</span>`).join("");
 }
 function renderCharacterMini(character) {
   const image = getConditionPortrait(character);
@@ -437,19 +360,39 @@ function render() {
   renderRollHistory();
   renderKillerPlaceholders();
   if (!characters.length) {
+    renderedCards.clear();
     grid.innerHTML = `<section class="empty-master-state"><h2>Nenhum sobrevivente criado</h2><p>Use o botão + para criar personagens.</p></section>`;
     return;
   }
-  grid.innerHTML = characters.map(renderCharacterMini).join("");
-  bindActions();
+  if (!renderedCards.size) grid.replaceChildren();
+  const activeIds = new Set(characters.map((character) => character.id));
+  for (const [id, entry] of renderedCards) {
+    if (!activeIds.has(id)) {
+      entry.element.remove();
+      renderedCards.delete(id);
+    }
+  }
+  characters.forEach((character, index) => {
+    const snapshot = JSON.stringify(character);
+    let entry = renderedCards.get(character.id);
+    if (entry?.snapshot !== snapshot) {
+      const template = document.createElement("template");
+      template.innerHTML = renderCharacterMini(character).trim();
+      const element = template.content.firstElementChild;
+      entry?.element.replaceWith(element);
+      entry = { snapshot, element };
+      renderedCards.set(character.id, entry);
+    }
+    if (grid.children[index] !== entry.element) {
+      grid.insertBefore(entry.element, grid.children[index] || null);
+    }
+  });
   animateDiceResults(document);
 }
-function bindActions() {
-  grid.querySelectorAll("[data-action]").forEach((el) => el.addEventListener("click", handleAction));
-  grid.querySelectorAll(".health-mark,.stack-drop,.master-vhs-mini-resource button,.master-vhs-card-links button,.master-cond-icon").forEach((el) => {
-    el.addEventListener("click", (event) => event.stopPropagation());
-  });
-}
+grid.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-action]");
+  if (button && grid.contains(button) && !button.disabled) handleAction(button);
+});
 function animateDiceResults(container) {
   container.querySelectorAll(".dice-result[data-final-value]").forEach((element) => {
     const finalValue = Number(element.dataset.finalValue);
@@ -499,8 +442,7 @@ function playState(condition) {
   window.NevoaAudio?.unlock();
   window.NevoaAudio?.playState(condition, condition === "morto" ? 0.78 : 0.66);
 }
-function handleAction(event) {
-  const b = event.currentTarget;
+function handleAction(b) {
   const id = b.dataset.id;
   const action = b.dataset.action;
   if (action === "set-marks") {

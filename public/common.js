@@ -334,7 +334,71 @@
     navigator.clipboard?.writeText(text);
   }
 
+  function createDiceController({ showLabels = false } = {}) {
+    const diceLocalTimings = new Map();
+    const diceServerFrames = new Map();
+    const CLIENT_DICE_ANIMATION_MS = 3000;
+    const CLIENT_DICE_VISIBLE_MS = 11000;
+    function makeClientRollKey(characterId, resource, roll) {
+      return roll?.id || roll?.key || `${characterId || "local"}:${resource || "roll"}:${roll?.at || 0}:${roll?.value || 0}`;
+    }
+    function getClientRollTiming(key) {
+      let timing = diceLocalTimings.get(key);
+      if (!timing) {
+        const now = performance.now();
+        timing = { startedAt: now, revealAt: now + CLIENT_DICE_ANIMATION_MS, hideAt: now + CLIENT_DICE_VISIBLE_MS };
+        diceLocalTimings.set(key, timing);
+      }
+      return timing;
+    }
+    function primeClientRollTiming(key) {
+      const now = performance.now();
+      diceLocalTimings.set(key, { startedAt: now, revealAt: now + CLIENT_DICE_ANIMATION_MS, hideAt: now + CLIENT_DICE_VISIBLE_MS });
+    }
+    function isClientRollRolling(key) {
+      return performance.now() < getClientRollTiming(key).revealAt;
+    }
+    function isClientRollVisible(key) {
+      return performance.now() < getClientRollTiming(key).hideAt;
+    }
+    function getDiceDisplayValue(key, finalValue) {
+      const frame = diceServerFrames.get(key);
+      if (frame && !frame.final) return String(frame.value);
+      if (frame && frame.final) return String(finalValue);
+      return isClientRollRolling(key) ? String(Math.floor(Math.random() * 20) + 1) : String(finalValue);
+    }
+    function setDiceTargetState(target, value, final = false) {
+      target.textContent = String(value);
+      const d20Display = target.closest('.sheet-d20-display');
+      const popup = target.closest('.vhs-roll-popup-d20');
+      const container = popup || d20Display;
+      const label = container?.querySelector('em');
+      if (final) {
+        target.classList.remove('dice-rolling');
+        target.classList.add('dice-revealed');
+        container?.classList.remove('rolling');
+        if (label) label.textContent = showLabels ? 'RESULTADO' : '';
+        setTimeout(() => target.classList.remove('dice-revealed'), 620);
+      } else {
+        target.classList.add('dice-rolling');
+        target.classList.remove('dice-revealed');
+        container?.classList.add('rolling');
+        if (label) label.textContent = showLabels ? 'ROLANDO' : '';
+      }
+    }
+    function applyDiceServerFrame(key, value, final = false) {
+      if (!key || !Number.isFinite(Number(value))) return;
+      diceServerFrames.set(key, { value: Number(value), final: !!final });
+      document.querySelectorAll(`.dice-result[data-client-roll-key="${key}"]`).forEach((target) => {
+        setDiceTargetState(target, Number(value), !!final);
+      });
+    }
+
+    return { diceLocalTimings, diceServerFrames, CLIENT_DICE_ANIMATION_MS, makeClientRollKey, getClientRollTiming, primeClientRollTiming, isClientRollRolling, isClientRollVisible, getDiceDisplayValue, applyDiceServerFrame };
+  }
+
   window.NevoaCommon = {
+    createDiceController,
     RESOURCE_LABELS,
     RESOURCE_ICON,
     CONDITION_LABELS,

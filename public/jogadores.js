@@ -1,8 +1,9 @@
-const socket = io();
+const socket = window.nevoaSocket || (window.nevoaSocket = io());
 const Common = window.NevoaCommon;
 const CAT = window.NEVOA_PLAYER_CATALOG;
 const grid = document.getElementById("players-grid");
 const { escapeHtml, getConditionPortrait, formatCondition } = Common;
+let renderedMarkup = "";
 
 function svg(key) {
   return CAT?.svg?.[key] || CAT?.svg?.star || "";
@@ -18,6 +19,7 @@ function renderCharacters(state) {
     .sort((a, b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
 
   if (!characters.length) {
+    renderedMarkup = "";
     grid.innerHTML = `
       <article class="players-empty">
         <strong>Nenhum personagem criado ainda.</strong>
@@ -27,14 +29,14 @@ function renderCharacters(state) {
     return;
   }
 
-  grid.innerHTML = characters.map((character) => {
+  const markup = characters.map((character) => {
     const portrait = getConditionPortrait(character);
     const style = getStyle(character);
     const stateLabel = formatCondition(character.estado);
     return `
       <article class="player-select-card condition-${escapeHtml(character.estado)}">
         <a class="player-select-photo" href="/jogador/${encodeURIComponent(character.id)}">
-          ${portrait ? `<img src="${portrait}" alt="Retrato de ${escapeHtml(character.nome)}">` : `<span>${svg(style?.icon || "user")}</span>`}
+          ${portrait ? `<img src="${portrait}" loading="lazy" decoding="async" alt="Retrato de ${escapeHtml(character.nome)}">` : `<span>${svg(style?.icon || "user")}</span>`}
           <em>${escapeHtml(stateLabel)}</em>
         </a>
         <div class="player-select-info">
@@ -48,12 +50,15 @@ function renderCharacters(state) {
         </div>
       </article>`;
   }).join("");
+  if (markup !== renderedMarkup) {
+    grid.innerHTML = markup;
+    renderedMarkup = markup;
+  }
 }
 
 socket.on("state:update", renderCharacters);
-fetch("/api/state")
-  .then((response) => response.json())
-  .then(renderCharacters)
-  .catch(() => {
+socket.on("connect_error", () => {
+  if (!renderedMarkup) {
     grid.innerHTML = `<article class="players-empty"><strong>Não foi possível carregar os personagens.</strong><p>Verifique se o servidor está aberto.</p></article>`;
-  });
+  }
+});

@@ -52,7 +52,7 @@
       const response = await fetch(url, { cache: "force-cache" });
       if (!response.ok) throw new Error(`Falha ao carregar ${url}`);
       const arrayBuffer = await response.arrayBuffer();
-      const decoded = await context.decodeAudioData(arrayBuffer.slice(0));
+      const decoded = await context.decodeAudioData(arrayBuffer);
       buffers.set(type, decoded);
       return decoded;
     })().catch((error) => {
@@ -118,6 +118,10 @@
     source.buffer = buffer;
     source.connect(gain);
     gain.connect(context.destination);
+    source.onended = () => {
+      source.disconnect();
+      gain.disconnect();
+    };
     source.start(0);
     unlocked = true;
     return true;

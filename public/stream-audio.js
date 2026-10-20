@@ -1,4 +1,4 @@
-const socket = io();
+const socket = window.nevoaSocket || (window.nevoaSocket = io());
 const enableButton = document.getElementById("enable-stream-audio");
 const status = document.getElementById("audio-status");
 const connectionLabel = document.getElementById("audio-connection");

@@ -21,16 +21,18 @@ const UPLOADS_DIR = path.join(PUBLIC_DIR, "uploads");
 const PORTRAIT_DIR = path.join(UPLOADS_DIR, "portraits");
 const APP_VERSION = "v63-performance";
 const DICE_ANIMATION_MS = 3000;
-app.disable("etag");
 app.use(express.json({ limit: "16mb" }));
 app.use((req, res, next) => {
-  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
+  // Keep live state fresh; static files can be revalidated without downloading again.
+  res.setHeader("Cache-Control", req.path.startsWith("/api/") ? "no-store" : "no-cache");
   res.setHeader("X-Uma-Noite-Version", APP_VERSION);
   next();
 });
-app.use(express.static(PUBLIC_DIR, { etag: false, maxAge: 0, lastModified: false }));
+app.use(express.static(PUBLIC_DIR, {
+  setHeaders(res) {
+    res.setHeader("Cache-Control", "no-cache");
+  }
+}));
 
 const ALLOWED_THEME_PRESETS = new Set(["ciano", "magenta", "ambar", "verde", "violeta", "laranja", "azul"]);
 
@@ -119,14 +121,40 @@ let audioSequence = 0;
 let sceneSequence = 0;
 
 let saveTimer = null;
+let saveInProgress = false;
+let savePending = false;
+let shutdownRequested = false;
+const SAVE_TEMP_PATH = `${DATA_PATH}.tmp`;
 function persistStateNow() {
   if (saveTimer) {
     clearTimeout(saveTimer);
     saveTimer = null;
   }
   state.updatedAt = Date.now();
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(DATA_PATH, JSON.stringify(state, null, 2), "utf8");
+  // Used at startup or after any asynchronous save has completed during shutdown.
+  const exitPath = `${DATA_PATH}.sync.tmp`;
+  fs.writeFileSync(exitPath, JSON.stringify(state), "utf8");
+  fs.renameSync(exitPath, DATA_PATH);
+}
+function flushState() {
+  saveTimer = null;
+  if (saveInProgress) {
+    savePending = true;
+    return;
+  }
+  saveInProgress = true;
+  savePending = false;
+  const snapshot = JSON.stringify(state);
+  fs.writeFile(SAVE_TEMP_PATH, snapshot, "utf8", (writeError) => {
+    const finish = (error) => {
+      saveInProgress = false;
+      if (error) console.error("Falha ao salvar estado:", error);
+      if (shutdownRequested) return shutdown();
+      if (savePending) flushState();
+    };
+    if (writeError) return finish(writeError);
+    fs.rename(SAVE_TEMP_PATH, DATA_PATH, finish);
+  });
 }
 function saveState({ immediate = false } = {}) {
   state.updatedAt = Date.now();
@@ -135,20 +163,15 @@ function saveState({ immediate = false } = {}) {
     return;
   }
   if (saveTimer) return;
-  saveTimer = setTimeout(() => {
-    saveTimer = null;
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-    fs.writeFile(DATA_PATH, JSON.stringify(state, null, 2), "utf8", (error) => {
-      if (error) console.error("Falha ao salvar estado:", error);
-    });
-  }, 120);
+  saveTimer = setTimeout(flushState, 120);
 }
-process.once("SIGINT", () => {
+function shutdown() {
+  shutdownRequested = true;
+  if (saveInProgress) return;
   try { persistStateNow(); } finally { process.exit(0); }
-});
-process.once("SIGTERM", () => {
-  try { persistStateNow(); } finally { process.exit(0); }
-});
+}
+process.once("SIGINT", shutdown);
+process.once("SIGTERM", shutdown);
 function getLocalIps() {
   return Object.values(os.networkInterfaces())
     .flat()
@@ -467,7 +490,7 @@ app.get("/assassino/overlay/:id", (_, res) => res.sendFile(path.join(__dirname, 
 app.get("/efeitos", (_, res) => res.sendFile(path.join(__dirname, "public", "effects.html")));
 app.get("/efeitos/:id", (_, res) => res.sendFile(path.join(__dirname, "public", "effects.html")));
 app.get("/api/state", (_, res) => res.json(state));
-app.get("/api/network", (_, res) => res.json({ version: APP_VERSION, port: PORT, ips: getLocalIps() }));
+app.get("/api/network", (_, res) => res.json({ version: APP_VERSION, port: server.address()?.port || PORT, ips: getLocalIps() }));
 
 io.on("connection", (socket) => {
   socket.emit("state:update", state);
@@ -875,7 +898,8 @@ io.on("connection", (socket) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`\nUma Noite no Inferno — servidor iniciado\nLocal: http://localhost:${PORT}`);
-  getLocalIps().forEach((ip) => console.log(`Rede:  http://${ip}:${PORT}`));
+  const port = server.address().port;
+  console.log(`\nUma Noite no Inferno — servidor iniciado\nLocal: http://localhost:${port}`);
+  getLocalIps().forEach((ip) => console.log(`Rede:  http://${ip}:${port}`));
   console.log("\nPainel sobreviventes: /mestre\nPainel assassinos:     /assassinos\nFX da stream:          /efeitos\n");
 });

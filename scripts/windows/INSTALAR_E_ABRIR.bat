@@ -1,6 +1,6 @@
 @echo off
 title Alem da Nevoa - Instalacao e Servidor
-cd /d "%~dp0"
+cd /d "%~dp0..\.." || exit /b 1
 
 where node >nul 2>nul
 if errorlevel 1 (

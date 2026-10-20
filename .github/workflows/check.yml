@@ -12,10 +12,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
-      - name: Syntax check
-        run: |
-          node --check server.js
-          for f in public/*.js; do
-            node --check "$f"
-          done
+      - run: npm ci
+      - run: npm run check
+      - run: npm test

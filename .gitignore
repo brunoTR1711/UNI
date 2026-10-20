@@ -1,6 +1,5 @@
 # Dependências
 node_modules/
-package-lock.json
 
 # Dados vivos da mesa/campanha
 # O servidor recria data/state.json automaticamente.
