@@ -307,7 +307,7 @@ function renderOverlayEffects(character) {
   </section>`;
 }
 function d20RollSvg() {
-  return `<img class="vhs-d20-bg" src="/context_assets/result-display-d20.png" alt="" aria-hidden="true">`;
+  return `<img class="vhs-d20-bg" src="/assets/result-display-d20.png" alt="" aria-hidden="true">`;
 }
 function makeLatestRoll(character) {
   const activeRolls = ["cooperacao", "folego", "foco"].map((resource) => {
