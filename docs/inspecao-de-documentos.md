@@ -10,7 +10,7 @@ Este recurso é **independente dos itens consumíveis**. Bilhetes, páginas, fot
 4. Selecione uma imagem PNG, WebP ou JPG. O servidor grava o arquivo em `public/inspection-images/` sem convertê-lo; a transparência de PNG e WebP permanece intacta. Tamanho máximo: **6 MB**.
 5. Marque **um ou mais personagens** e clique **Salvar e enviar**. O comando envia para todas as fichas selecionadas, mesmo que o navegador esteja em outro dispositivo conectado ao mesmo servidor (incluindo Tailscale).
 
-Use **Salvar** para preparar documentos antes da sessão. Clique num documento existente na lista para editar, enviar novamente ou excluir. Documentos já enviados preservam a versão do texto/imagem que o jogador recebeu, mesmo se o mestre editar ou apagar o original do catálogo.
+Use **Salvar** para preparar documentos antes da sessão. No catálogo, clique em **Editar** para alterar o conteúdo ou **Enviar** para selecionar os destinatários. O documento enviado mantém a versão do conteúdo que o personagem recebeu enquanto estiver cadastrado. **Excluir** o documento do catálogo remove imediatamente as cópias de todos os personagens, incluindo históricos de leitura e recebimentos pendentes, e encerra a apresentação dele no FX, se estiver ativa.
 
 ## O que o jogador vê
 
@@ -29,3 +29,24 @@ Use **Salvar** para preparar documentos antes da sessão. Clique num documento e
 **Ao atualizar o tablet**, preserve a pasta `data/` **e** `public/inspection-images/`. Para GitHub, a pasta de imagens de inspeção é separada dos retratos (`public/uploads/`). Se guardar imagens no repositório, lembre-se de que elas podem ficar públicas num repositório público.
 
 O servidor original não tem autenticação por usuário; esta função segue o mesmo modelo de confiança do painel do mestre. Não exponha a aplicação inteira à internet aberta sem proteção adicional.
+
+
+## Atualização v65: editor, envio e apresentação da stream
+
+- **Criar / editar:** formulário de imagem, nome e leitura. Salvar fecha o editor.
+- **Catálogo:** botões **Editar** e **Enviar** separados. Excluir continua disponível dentro da edição.
+- **Enviar:** janela de seleção de um ou mais personagens, sem campos de edição.
+- **Apresentação do mestre:** ao enviar, a janela de inspeção abre no mestre; **Ler** revela o texto e **Fechar** encerra a apresentação.
+- **Tela `/efeitos`:** espelha exatamente os estados da apresentação do mestre, mas sem interceptar mouse/teclado; o entorno é transparente para OBS.
+- **Jogadores:** recebem a mesma entrega persistente que já existia e podem ler independentemente, sem afetar o FX.
+- **Recarga do OBS ou reconexão:** a apresentação ativa é recuperada do estado persistido; fechar limpa essa apresentação no servidor.
+- **Imagens:** continuar utilizando `public/inspection-images/`, preservando seus arquivos e `data/` nas atualizações.
+
+
+## Atualização v66: exclusão sincronizada dos históricos
+
+- Ao apagar um documento em **Editar → Excluir**, as entregas e o histórico correspondente desaparecem de **todos** os jogadores, mesmo que já tenham lido o texto.
+- Fichas abertas recebem essa exclusão em tempo real. Janelas do documento excluído se fecham automaticamente.
+- Se o mestre estiver apresentando o documento, a janela no mestre e no `/efeitos` também fecha.
+- Ao iniciar, o servidor remove registros órfãos de documentos excluídos em versões anteriores.
+- Outros documentos, leituras e itens de inventário permanecem inalterados.

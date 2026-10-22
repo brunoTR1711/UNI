@@ -219,11 +219,63 @@ test("inspeção: upload PNG com alfa, catálogo, envio, leitura e histórico in
   assert.equal(delivery.readAt, null);
   assert.equal(delivery.closedAt, null);
   assert.equal(current.characters.ana.items.length, 5);
+  // A apresentação do mestre é independente do que cada jogador lê.
+  const live = current.inspectionPresentation;
+  assert.ok(live?.id?.startsWith('present-'));
+  assert.equal(live.title, 'Bilhete de teste');
+  assert.equal(live.reading, false);
+  await client.emit("inspection:presentationAction", { id: live.id, action: "read" });
+  current = await state();
+  assert.equal(current.inspectionPresentation.reading, true);
+  assert.equal(current.characters.ana.inspectionDeliveries.find(d => d.id === delivery.id).readAt, null);
+  await client.emit("inspection:presentationAction", { id: live.id, action: "close" });
+  current = await state();
+  assert.equal(current.inspectionPresentation, null);
+  assert.ok(current.inspectionPresentationRevision > live.revision);
   await client.emit("inspection:markRead", { characterId: "ana", deliveryId: delivery.id });
   await client.emit("inspection:finish", { characterId: "ana", deliveryId: delivery.id });
   await client.emit("inspection:deleteDocument", { id: doc.id });
   current = await state();
   assert.ok(!current.inspectionDocuments.find((d) => d.id === doc.id));
-  assert.ok(current.characters.ana.inspectionDeliveries.find((d) => d.id === delivery.id)?.closedAt);
-  assert.equal(current.characters.ana.inspectionDeliveries.find((d) => d.id === delivery.id).body, delivery.body);
+  assert.ok(!current.characters.ana.inspectionDeliveries.some((d) => d.id === delivery.id),
+    "Excluir do catálogo também revoga o histórico já lido.");
+});
+
+test("exclusão de documentos revoga leitores, pendências e apresentação FX, sem tocar em outros documentos", async () => {
+  const newDoc = async (title) => {
+    await client.emit("inspection:saveDocument", { title, body: `Conteúdo: ${title}`, style: "typewritten" });
+    return (await state()).inspectionDocuments.find((doc) => doc.title === title);
+  };
+  // Bia foi removida no teste anterior. Recria para comprovar vários destinatários.
+  await client.emit("character:create", { id: "bia", nome: "Bia" });
+  const condemned = await newDoc("Documento a excluir");
+  const kept = await newDoc("Documento mantido");
+  await client.emit("inspection:send", { documentId: kept.id, characterIds: ["ana", "bia"] });
+  const keptAna = (await state()).characters.ana.inspectionDeliveries.find(e => e.documentId === kept.id);
+  await client.emit("inspection:markRead", { characterId: "ana", deliveryId: keptAna.id });
+  await client.emit("inspection:finish", { characterId: "ana", deliveryId: keptAna.id });
+  await client.emit("inspection:send", { documentId: condemned.id, characterIds: ["ana", "bia"] });
+  let current = await state();
+  const toDeleteAna = current.characters.ana.inspectionDeliveries.find(e => e.documentId === condemned.id);
+  const toDeleteBia = current.characters.bia.inspectionDeliveries.find(e => e.documentId === condemned.id);
+  assert.ok(toDeleteAna && toDeleteBia);
+  await client.emit("inspection:markRead", { characterId: "ana", deliveryId: toDeleteAna.id });
+  await client.emit("inspection:finish", { characterId: "ana", deliveryId: toDeleteAna.id });
+  const live = (await state()).inspectionPresentation;
+  assert.equal(live.documentId, condemned.id);
+  await client.emit("inspection:deleteDocument", { id: condemned.id });
+  current = await state();
+  assert.ok(!current.inspectionDocuments.some(doc => doc.id === condemned.id));
+  assert.ok(!current.characters.ana.inspectionDeliveries.some(e => e.documentId === condemned.id));
+  assert.ok(!current.characters.bia.inspectionDeliveries.some(e => e.documentId === condemned.id));
+  assert.ok(current.characters.ana.inspectionDeliveries.some(e => e.id === keptAna.id));
+  assert.ok(current.characters.bia.inspectionDeliveries.some(e => e.documentId === kept.id));
+  assert.equal(current.inspectionPresentation, null);
+  assert.ok(current.inspectionPresentationRevision > live.revision);
+  const events = await client.events();
+  assert.ok(events.some(([name, payload]) => name === "inspection:presentation" &&
+    payload.action === "close" && payload.id === live.id));
+  // Eventos de leitura obsoletos não ressuscitam um item apagado.
+  await client.emit("inspection:markRead", { characterId: "bia", deliveryId: toDeleteBia.id });
+  assert.ok(!(await state()).characters.bia.inspectionDeliveries.some(e => e.documentId === condemned.id));
 });

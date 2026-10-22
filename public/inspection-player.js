@@ -9,6 +9,7 @@
   let activeId = null;
   let reading = false;
   let historyVisible = false;
+  let historyId = null;
   let hasLoaded = false;
   let known = new Set();
   let audio = null;
@@ -111,12 +112,14 @@
   function closeHistory() {
     $('inspection-history-overlay').hidden = true;
     historyVisible = false;
+    historyId = null;
     if (!activeId) document.body.classList.remove('inspection-modal-open');
     nextDelivery(false);
   }
   function openHistory(entry) {
     if (!entry?.readAt || activeId) return;
     historyVisible = true;
+    historyId = entry.id;
     $('inspection-history-title').textContent = entry.title;
     setPaper($('inspection-history-paper'), entry);
     $('inspection-history-overlay').hidden = false;
@@ -158,7 +161,26 @@
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && historyVisible) closeHistory(); });
   window.UNIInspectionPlayer = { refresh: renderHistory };
   socket.on('state:update', (state) => {
-    deliveries = state.characters?.[characterId]?.inspectionDeliveries || [];
+    // O catálogo do mestre é a autoridade: entradas sem documento não
+    // podem reaparecer no histórico, nem após reconexão ou dados antigos.
+    const currentCatalog = new Set((state.inspectionDocuments || []).map(doc => doc.id));
+    deliveries = (state.characters?.[characterId]?.inspectionDeliveries || [])
+      .filter(entry => currentCatalog.has(entry.documentId));
+
+    // Excluir o documento fecha imediatamente qualquer janela dele que
+    // já estava aberta; isso vale tanto para a leitura quanto para o histórico.
+    if (activeId && !active()) {
+      $('inspection-player-overlay').hidden = true;
+      activeId = null;
+      reading = false;
+      if (!historyVisible) document.body.classList.remove('inspection-modal-open');
+    }
+    if (historyId && !deliveries.some(entry => entry.id === historyId)) {
+      $('inspection-history-overlay').hidden = true;
+      historyVisible = false;
+      historyId = null;
+      if (!activeId) document.body.classList.remove('inspection-modal-open');
+    }
     const currentNew = new Set(deliveries.filter(entry => !entry.closedAt).map(entry => entry.id));
     const hasNew = [...currentNew].some(id => !known.has(id));
     const shouldSound = hasLoaded && hasNew;

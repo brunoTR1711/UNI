@@ -23,7 +23,7 @@ const PORTRAIT_DIR = path.join(UPLOADS_DIR, "portraits");
 // Coleção independente das imagens de documentos (PNG com transparência preservada).
 const INSPECTION_IMAGES_DIR = path.join(PUBLIC_DIR, "inspection-images");
 fs.mkdirSync(INSPECTION_IMAGES_DIR, { recursive: true });
-const APP_VERSION = "v64-inspecao";
+const APP_VERSION = "v66-inspecao-historico-vinculado";
 const DICE_ANIMATION_MS = 3000;
 app.use(express.json({ limit: "16mb" }));
 app.use((req, res, next) => {
@@ -102,7 +102,7 @@ const TARGETED_SCENE_EVENTS = new Set([
 ]);
 
 function defaultState() {
-  return { characters: {}, assassins: {}, sceneHistory: [], inspectionDocuments: [], updatedAt: Date.now() };
+  return { characters: {}, assassins: {}, sceneHistory: [], inspectionDocuments: [], inspectionPresentation: null, inspectionPresentationRevision: 0, updatedAt: Date.now() };
 }
 function loadState() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -372,8 +372,26 @@ function normalizeState() {
   state.assassins ||= {};
   state.sceneHistory ||= [];
   state.inspectionDocuments = Array.isArray(state.inspectionDocuments) ? state.inspectionDocuments : [];
+  state.inspectionPresentation = state.inspectionPresentation && typeof state.inspectionPresentation.id === "string"
+    ? state.inspectionPresentation : null;
+  state.inspectionPresentationRevision = Number(state.inspectionPresentationRevision) || 0;
   for (const id of Object.keys(state.characters)) state.characters[id] = normalizeCharacter(state.characters[id], id);
   for (const id of Object.keys(state.assassins)) state.assassins[id] = normalizeAssassin(state.assassins[id], id);
+
+  // v66: o catálogo do mestre define quais documentos ainda existem.
+  // Limpa históricos órfãos deixados por exclusões de versões anteriores,
+  // inclusive para jogadores que estão offline durante a atualização.
+  const validDocumentIds = new Set(state.inspectionDocuments.map((doc) => doc.id));
+  for (const character of Object.values(state.characters)) {
+    const previous = character.inspectionDeliveries || [];
+    character.inspectionDeliveries = previous.filter((entry) => validDocumentIds.has(entry.documentId));
+    if (character.inspectionDeliveries.length !== previous.length) stateDataMigrated = true;
+  }
+  if (state.inspectionPresentation && !validDocumentIds.has(state.inspectionPresentation.documentId)) {
+    state.inspectionPresentation = null;
+    state.inspectionPresentationRevision += 1;
+    stateDataMigrated = true;
+  }
 }
 normalizeState();
 if (stateDataMigrated) persistStateNow();
@@ -543,8 +561,9 @@ app.get("/api/network", (_, res) => res.json({ version: APP_VERSION, port: serve
 io.on("connection", (socket) => {
   socket.emit("state:update", state);
 
-  // Documentos investigativos não são itens de inventário. Cada envio conserva
-  // uma fotografia do texto, permitindo reler mesmo após editar/apagar o original.
+  // Documentos investigativos não são itens de inventário. Cada envio guarda
+  // o conteúdo recebido, mas só permanece disponível enquanto houver um
+  // documento correspondente no catálogo do mestre.
   socket.on("inspection:saveDocument", (payload, ack) => {
     const existing = state.inspectionDocuments.find((doc) => doc.id === payload?.id);
     if (state.inspectionDocuments.length >= 150 && !existing) return ack?.({ ok: false, error: "Limite de 150 documentos." });
@@ -559,8 +578,28 @@ io.on("connection", (socket) => {
     const index = state.inspectionDocuments.findIndex((doc) => doc.id === id);
     if (index < 0) return ack?.({ ok: false, error: "Documento não encontrado." });
     state.inspectionDocuments.splice(index, 1);
+
+    // Revoga imediatamente TODAS as cópias recebidas: pendentes, em leitura
+    // e já lidas. O state:update avisa as fichas abertas em qualquer aparelho.
+    let removedDeliveries = 0;
+    for (const character of Object.values(state.characters)) {
+      const previous = character.inspectionDeliveries || [];
+      character.inspectionDeliveries = previous.filter((entry) => entry.documentId !== id);
+      removedDeliveries += previous.length - character.inspectionDeliveries.length;
+    }
+
+    // Se a pista estiver em apresentação no mestre/OBS, também a encerra.
+    const closingPresentation = state.inspectionPresentation?.documentId === id;
+    let revision = null;
+    let presentationId = null;
+    if (closingPresentation) {
+      presentationId = state.inspectionPresentation.id;
+      state.inspectionPresentation = null;
+      revision = ++state.inspectionPresentationRevision;
+    }
     emitState();
-    ack?.({ ok: true });
+    if (closingPresentation) io.emit("inspection:presentation", { action: "close", id: presentationId, revision });
+    ack?.({ ok: true, removedDeliveries });
   });
   socket.on("inspection:send", ({ documentId, characterIds }, ack) => {
     const doc = state.inspectionDocuments.find((entry) => entry.id === documentId);
@@ -586,8 +625,39 @@ io.on("connection", (socket) => {
     });
     emitState();
     io.emit("inspection:assigned", { notices });
-    ack?.({ ok: true, count: notices.length });
+    // A apresentação do mestre é independente das entregas. Um único snapshot
+    // controla a janela do mestre e a camada FX, inclusive após reconexões.
+    const presentation = {
+      id: `present-${crypto.randomBytes(10).toString("hex")}`,
+      documentId: doc.id, title: doc.title, body: doc.body,
+      image: doc.image, style: doc.style, reading: false,
+      openedAt: Date.now(), revision: ++state.inspectionPresentationRevision
+    };
+    state.inspectionPresentation = presentation;
+    emitState();
+    io.emit("inspection:presentation", { action: "open", presentation, presenterSocketId: socket.id });
+    ack?.({ ok: true, count: notices.length, presentation });
   });
+  socket.on("inspection:presentationAction", ({ id, action }, ack) => {
+    const presentation = state.inspectionPresentation;
+    if (!presentation || presentation.id !== id) return ack?.({ ok: false, error: "Apresentação não está mais ativa." });
+    if (action === "read" && !presentation.reading) {
+      presentation.reading = true;
+      presentation.revision = ++state.inspectionPresentationRevision;
+      emitState();
+      io.emit("inspection:presentation", { action: "read", presentation: { ...presentation } });
+      return ack?.({ ok: true });
+    }
+    if (action === "close") {
+      state.inspectionPresentation = null;
+      const revision = ++state.inspectionPresentationRevision;
+      emitState();
+      io.emit("inspection:presentation", { action: "close", id, revision });
+      return ack?.({ ok: true });
+    }
+    ack?.({ ok: action === "read", error: action === "read" ? undefined : "Ação inválida." });
+  });
+
   socket.on("inspection:markRead", ({ characterId, deliveryId }, ack) => {
     const character = state.characters[sanitizeId(characterId)];
     const delivery = character?.inspectionDeliveries?.find((entry) => entry.id === deliveryId);

@@ -109,3 +109,30 @@
 /* Grade de viewport explícita: evita que o popup encolha à largura intrínseca no Android. */
 .inspection-editor-overlay,.inspection-player-overlay{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
 .inspection-editor-window,.inspection-view-window{box-sizing:border-box;justify-self:center;align-self:center;min-width:0}
+
+
+/* v65: catálogo compacto com controles separados; editor sem escolha de alvo. */
+.inspection-master-entry{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;padding:10px 11px;border:1px solid rgba(109,151,164,.3);background:linear-gradient(105deg,#080e12,#0b161c);min-width:0;color:#eaf2f3}
+.inspection-master-entry+.inspection-master-entry{margin-top:6px}
+.inspection-entry-details{min-width:0;display:grid;gap:3px}
+.inspection-entry-details strong{font-size:13px;overflow-wrap:anywhere}
+.inspection-entry-details small{color:#92acb6;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.inspection-entry-actions{grid-column:1/-1;display:flex;gap:7px;margin-top:2px}
+.inspection-entry-actions button{flex:1;min-width:0;font-size:11px;letter-spacing:.05em;cursor:pointer;padding:8px 10px;background:#0b151a;color:#f2f6f5;border:1px solid #4a707a}
+.inspection-entry-actions button:hover{border-color:#a3d2db}
+.inspection-entry-actions .inspection-primary{background:#bddbd5!important;color:#0b171c!important;border-color:#e1fff4!important}
+.inspection-send-window{width:min(470px,100%)}
+.inspection-send-body{display:grid;gap:14px;padding:17px;overflow:auto;min-height:100px}
+.inspection-send-recipients{max-height:min(52vh,380px);overflow:auto;display:grid;gap:7px}
+.inspection-send-recipients .inspection-person-check{font-size:14px;padding:11px 10px}
+.inspection-master-presentation{z-index:20100}
+.inspection-master-presentation .inspection-view-window{--inspection-accent:#9cd3d3}
+.inspection-master-presentation .inspection-view-foot{justify-content:center}
+/* Camada transparente do OBS: apresenta a mesma caixa, sem escurecer o vídeo. */
+.inspection-fx-presentation{position:fixed;inset:0;z-index:1500;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:center;padding:20px;pointer-events:none;font-family:Arial,sans-serif;box-sizing:border-box}
+.inspection-fx-presentation[hidden]{display:none!important}
+.inspection-fx-presentation .inspection-view-window{align-self:center;justify-self:center;--inspection-accent:#9cd3d3;width:min(510px,100%);max-height:min(90vh,880px);background:linear-gradient(155deg,#172429,#080b0e 50%,#0d171d);color:#eaf1f0}
+.inspection-fx-presentation .inspection-view-content{width:100%;box-sizing:border-box}
+.inspection-fx-button{padding:10px 27px;min-width:125px;text-align:center;border:1px solid #57717a;background:#101b20;color:#f0f4f4;font-size:13px;font-weight:bold;letter-spacing:.07em;box-sizing:border-box}
+.inspection-fx-active .effects-helper,.inspection-fx-active .fx-audio-panel{display:none!important}
+@media(max-width:650px){.inspection-fx-presentation{padding:9px}.inspection-entry-actions button{font-size:11px}}
