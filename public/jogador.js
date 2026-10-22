@@ -261,13 +261,13 @@ function renderItemsCompact() {
 function renderLatestRollPanel() {
   const latest = getLatestRollData();
   if (!latest) {
-    return `<section class="vhs-card vhs-roll-panel empty"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display idle"><img src="/context_assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON.foco}</span><strong>—</strong><em></em></div></div></section>`;
+    return `<section class="vhs-card vhs-roll-panel empty"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display idle"><img src="/assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON.foco}</span><strong>—</strong><em></em></div></div></section>`;
   }
   const roll = latest.roll;
   const rollKey = makeClientRollKey(id, latest.resource, roll);
   const isRolling = isClientRollRolling(rollKey);
   const visibleValue = getDiceDisplayValue(rollKey, roll.value);
-  return `<section class="vhs-card vhs-roll-panel"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display ${isRolling ? 'rolling' : ''}"><img src="/context_assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON[latest.resource]}</span><strong class="dice-result" data-client-roll-key="${escapeHtml(rollKey)}" data-roll-at="${roll.at}" data-reveal-at="${roll.revealAt || roll.at}" data-final-value="${roll.value}">${visibleValue}</strong><em>${isRolling ? 'ROLANDO' : ''}</em></div></div></section>`;
+  return `<section class="vhs-card vhs-roll-panel"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display ${isRolling ? 'rolling' : ''}"><img src="/assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON[latest.resource]}</span><strong class="dice-result" data-client-roll-key="${escapeHtml(rollKey)}" data-roll-at="${roll.at}" data-reveal-at="${roll.revealAt || roll.at}" data-final-value="${roll.value}">${visibleValue}</strong><em>${isRolling ? 'ROLANDO' : ''}</em></div></div></section>`;
 }
 function renderAttributeStatePanel() {
   return `
