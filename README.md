@@ -26,6 +26,7 @@ UNI/
 │   └── check.js          Verificação de código e referências
 ├── public/
 │   ├── assets/           Sons e imagem do dado
+│   ├── inspection-images/ Imagens dos documentos de inspeção
 │   └── …                 Páginas, estilos e scripts do navegador
 ├── test/                 Testes de regressão
 ├── data/                 Dados locais da mesa
@@ -134,3 +135,7 @@ Se uma página ficar desatualizada após substituir arquivos, reinicie o servido
 Se o dado não aparecer, confira se ficha e overlay estão ligados à mesma instância do servidor e se há erros no console. A identificação da rolagem, seus frames e o resultado final devem vir da mesma instância.
 
 Para problemas de som, use os testes de `/audio`, confira a ativação por interação e o mixer do OBS. Em acesso remoto, confirme o endereço/porta do servidor e a conectividade da rede utilizada. O projeto mantém o modelo original de acesso por links, sem autenticação forte.
+
+## Documentos para inspeção
+
+O painel do mestre inclui **Inspeção de documentos** para criar bilhetes/arquivos com imagem e texto, e entregá-los a um ou mais sobreviventes. A ficha apresenta a imagem com animação breve, botão **LER** e histórico textual separado do inventário. Imagens são armazenadas em `public/inspection-images/` e não perdem a transparência PNG. Veja [guia de inspeção](docs/inspecao-de-documentos.md). Na atualização do tablet, preserve também essa pasta de imagens.

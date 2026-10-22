@@ -332,8 +332,10 @@ function render() {
         ${renderItemsCompact()}
         ${renderLatestRollPanel()}
       </section>
+      <section id="inspection-history-slot" class="inspection-history-slot" aria-label="Histórico de leitura"></section>
     </section>
   `;
+  window.UNIInspectionPlayer?.refresh?.();
   animateDiceResults(root);
   bindPlayerNotes();
   previousCondition = character.estado;

@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const crypto = require("crypto");
 
 const app = express();
 const server = http.createServer(app);
@@ -19,7 +20,10 @@ const DATA_PATH = path.join(DATA_DIR, "state.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
 const UPLOADS_DIR = path.join(PUBLIC_DIR, "uploads");
 const PORTRAIT_DIR = path.join(UPLOADS_DIR, "portraits");
-const APP_VERSION = "v63-performance";
+// Coleção independente das imagens de documentos (PNG com transparência preservada).
+const INSPECTION_IMAGES_DIR = path.join(PUBLIC_DIR, "inspection-images");
+fs.mkdirSync(INSPECTION_IMAGES_DIR, { recursive: true });
+const APP_VERSION = "v64-inspecao";
 const DICE_ANIMATION_MS = 3000;
 app.use(express.json({ limit: "16mb" }));
 app.use((req, res, next) => {
@@ -98,7 +102,7 @@ const TARGETED_SCENE_EVENTS = new Set([
 ]);
 
 function defaultState() {
-  return { characters: {}, assassins: {}, sceneHistory: [], updatedAt: Date.now() };
+  return { characters: {}, assassins: {}, sceneHistory: [], inspectionDocuments: [], updatedAt: Date.now() };
 }
 function loadState() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -242,7 +246,8 @@ function defaultCharacter(id) {
     resources: { cooperacao: baseResource(), folego: baseResource(), foco: baseResource() },
     vantagens: [null, null, null, null],
     items: [null, null, null, null, null],
-    effects: []
+    effects: [],
+    inspectionDeliveries: []
   };
 }
 
@@ -334,6 +339,9 @@ function normalizeCharacter(character, id) {
   result.vantagens = Array.isArray(character?.vantagens) ? character.vantagens.slice(0, 4) : [null, null, null, null];
   while (result.vantagens.length < 4) result.vantagens.push(null);
   result.effects = Array.isArray(character?.effects) ? character.effects.filter(Boolean) : [];
+  result.inspectionDeliveries = Array.isArray(character?.inspectionDeliveries)
+    ? character.inspectionDeliveries.filter((entry) => entry && typeof entry.id === "string").slice(-150)
+    : [];
   const legacyItems = Array.isArray(character?.items)
     ? character.items.slice(0, 5)
     : (character?.item ? [character.item] : []);
@@ -363,6 +371,7 @@ function normalizeState() {
   state.characters ||= {};
   state.assassins ||= {};
   state.sceneHistory ||= [];
+  state.inspectionDocuments = Array.isArray(state.inspectionDocuments) ? state.inspectionDocuments : [];
   for (const id of Object.keys(state.characters)) state.characters[id] = normalizeCharacter(state.characters[id], id);
   for (const id of Object.keys(state.assassins)) state.assassins[id] = normalizeAssassin(state.assassins[id], id);
 }
@@ -477,6 +486,45 @@ function itemChangeAudio(characterId, previous, next) {
   emitAudio(next > previous ? "gained" : "lost", { characterId, resource: "item" });
 }
 
+// Upload restrito a formatos de imagem raster: não altera alfa de PNG/WebP.
+app.post("/api/inspection-images", async (req, res) => {
+  const dataUrl = req.body?.dataUrl;
+  if (typeof dataUrl !== "string") return res.status(400).json({ ok: false, error: "Imagem não enviada." });
+  const match = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
+  if (!match) return res.status(400).json({ ok: false, error: "Use PNG, JPG ou WebP." });
+  if (match[2].length > 9_000_000) return res.status(413).json({ ok: false, error: "Imagem muito grande (máximo 6 MB)." });
+  const contents = Buffer.from(match[2], "base64");
+  if (!contents.length || contents.length > 6 * 1024 * 1024) return res.status(413).json({ ok: false, error: "Limite: 6 MB por imagem." });
+  const isPng = contents.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  const isJpeg = contents[0] === 0xff && contents[1] === 0xd8 && contents[2] === 0xff;
+  const isWebp = contents.toString("ascii", 0, 4) === "RIFF" && contents.toString("ascii", 8, 12) === "WEBP";
+  if (!(match[1] === "png" && isPng || match[1] === "jpeg" && isJpeg || match[1] === "webp" && isWebp)) {
+    return res.status(400).json({ ok: false, error: "O arquivo não corresponde ao formato escolhido." });
+  }
+  const extension = match[1] === "jpeg" ? "jpg" : match[1];
+  const filename = `arquivo-${Date.now().toString(36)}-${crypto.randomBytes(6).toString("hex")}.${extension}`;
+  try {
+    await fs.promises.writeFile(path.join(INSPECTION_IMAGES_DIR, filename), contents, { flag: "wx" });
+    res.json({ ok: true, image: `/inspection-images/${filename}` });
+  } catch (error) {
+    console.error("Erro ao salvar imagem de inspeção", error);
+    res.status(500).json({ ok: false, error: "Não foi possível salvar a imagem." });
+  }
+});
+
+function normalizeInspectionDocument(payload, existing) {
+  const title = String(payload?.title || "").trim().slice(0, 110);
+  const body = String(payload?.body || "").trim().slice(0, 18000);
+  const style = ["handwritten", "typewritten", "plain"].includes(payload?.style) ? payload.style : "plain";
+  const image = typeof payload?.image === "string" && /^\/inspection-images\/[a-zA-Z0-9_.-]+$/.test(payload.image) ? payload.image : "";
+  if (!title || !body) return null;
+  return {
+    id: existing?.id || `doc-${crypto.randomBytes(9).toString("hex")}`,
+    title, body, style, image,
+    createdAt: existing?.createdAt || Date.now(), updatedAt: Date.now()
+  };
+}
+
 app.get("/", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 app.get("/mestre", (_, res) => res.sendFile(path.join(__dirname, "public", "mestre.html")));
 app.get("/jogadores", (_, res) => res.sendFile(path.join(__dirname, "public", "jogadores.html")));
@@ -494,6 +542,69 @@ app.get("/api/network", (_, res) => res.json({ version: APP_VERSION, port: serve
 
 io.on("connection", (socket) => {
   socket.emit("state:update", state);
+
+  // Documentos investigativos não são itens de inventário. Cada envio conserva
+  // uma fotografia do texto, permitindo reler mesmo após editar/apagar o original.
+  socket.on("inspection:saveDocument", (payload, ack) => {
+    const existing = state.inspectionDocuments.find((doc) => doc.id === payload?.id);
+    if (state.inspectionDocuments.length >= 150 && !existing) return ack?.({ ok: false, error: "Limite de 150 documentos." });
+    const doc = normalizeInspectionDocument(payload, existing);
+    if (!doc) return ack?.({ ok: false, error: "Preencha título e texto para salvar." });
+    if (existing) Object.assign(existing, doc);
+    else state.inspectionDocuments.unshift(doc);
+    emitState();
+    ack?.({ ok: true, document: doc });
+  });
+  socket.on("inspection:deleteDocument", ({ id }, ack) => {
+    const index = state.inspectionDocuments.findIndex((doc) => doc.id === id);
+    if (index < 0) return ack?.({ ok: false, error: "Documento não encontrado." });
+    state.inspectionDocuments.splice(index, 1);
+    emitState();
+    ack?.({ ok: true });
+  });
+  socket.on("inspection:send", ({ documentId, characterIds }, ack) => {
+    const doc = state.inspectionDocuments.find((entry) => entry.id === documentId);
+    if (!doc) return ack?.({ ok: false, error: "Salve o documento antes de enviar." });
+    const ids = [...new Set(Array.isArray(characterIds) ? characterIds.slice(0, 30).map(sanitizeId) : [])];
+    const targets = ids.map((id) => state.characters[id]).filter(Boolean);
+    if (!targets.length) return ack?.({ ok: false, error: "Selecione ao menos um personagem existente." });
+    const notices = [];
+    targets.forEach((character) => {
+      const delivery = {
+        id: `insp-${crypto.randomBytes(10).toString("hex")}`,
+        documentId: doc.id, title: doc.title, body: doc.body,
+        style: doc.style, image: doc.image, sentAt: Date.now(),
+        readAt: null, closedAt: null
+      };
+      character.inspectionDeliveries ||= [];
+      character.inspectionDeliveries.push(delivery);
+      // Evita crescimento ilimitado sem descartar documentos ainda não fechados.
+      const pending = character.inspectionDeliveries.filter((entry) => !entry.closedAt);
+      const closed = character.inspectionDeliveries.filter((entry) => entry.closedAt).slice(-120);
+      character.inspectionDeliveries = [...closed, ...pending];
+      notices.push({ characterId: character.id, deliveryId: delivery.id });
+    });
+    emitState();
+    io.emit("inspection:assigned", { notices });
+    ack?.({ ok: true, count: notices.length });
+  });
+  socket.on("inspection:markRead", ({ characterId, deliveryId }, ack) => {
+    const character = state.characters[sanitizeId(characterId)];
+    const delivery = character?.inspectionDeliveries?.find((entry) => entry.id === deliveryId);
+    if (!delivery) return ack?.({ ok: false });
+    if (!delivery.readAt) delivery.readAt = Date.now();
+    emitState();
+    ack?.({ ok: true });
+  });
+  socket.on("inspection:finish", ({ characterId, deliveryId }, ack) => {
+    const character = state.characters[sanitizeId(characterId)];
+    const delivery = character?.inspectionDeliveries?.find((entry) => entry.id === deliveryId);
+    if (!delivery) return ack?.({ ok: false });
+    if (!delivery.readAt) return ack?.({ ok: false, error: "Leia o documento antes de fechar." });
+    if (!delivery.closedAt) delivery.closedAt = Date.now();
+    emitState();
+    ack?.({ ok: true });
+  });
 
   socket.on("character:create", ({ id, nome }, ack) => {
     const character = ensureCharacter(id);

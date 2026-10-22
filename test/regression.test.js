@@ -148,7 +148,8 @@ test("rolagens mantêm resultado, eventos e duração; alterações rápidas sã
   assert.equal(persisted.characters.ana.nome, "Nome 19");
   assert.equal(persisted.characters.ana.resources.foco.lastRoll.value, roll.value);
   assert.equal(fs.existsSync(path.join(directory, "data/state.json.tmp")), false);
-  await delay(2300);
+  // Aguarda a janela completa da rolagem (90 ms por frame) mais margem do polling.
+  await delay(2500);
   const events = await client.events();
   assert.ok(events.some(([name, data]) => name === "dice:roll" && data.roll.id === roll.id));
   assert.ok(events.some(([name, data]) => name === "dice:frame" && !data.final));
@@ -190,4 +191,39 @@ test("controlador compartilhado preserva o relógio local e os frames do dado", 
   assert.equal(dice.isClientRollVisible("roll-1"), true);
   now = 11200;
   assert.equal(dice.isClientRollVisible("roll-1"), false);
+});
+
+
+test("inspeção: upload PNG com alfa, catálogo, envio, leitura e histórico independentes", async () => {
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a8XkAAAAASUVORK5CYII=", "base64");
+  const uploaded = await fetch(`${base}/api/inspection-images`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dataUrl: `data:image/png;base64,${png.toString("base64")}` })
+  });
+  assert.equal(uploaded.status, 200);
+  const { image } = await uploaded.json();
+  assert.match(image, /^\/inspection-images\/arquivo-.*\.png$/);
+  assert.deepEqual(Buffer.from(await (await fetch(base + image)).arrayBuffer()), png);
+
+  await client.emit("inspection:saveDocument", {
+    title: "Bilhete de teste", body: "Dia 22\n\nNão abra a porta.\n\n— M.",
+    style: "handwritten", image
+  });
+  let current = await state();
+  const doc = current.inspectionDocuments.find((d) => d.title === "Bilhete de teste");
+  assert.ok(doc);
+  await client.emit("inspection:send", { documentId: doc.id, characterIds: ["ana"] });
+  current = await state();
+  const delivery = current.characters.ana.inspectionDeliveries.find((d) => d.documentId === doc.id);
+  assert.equal(delivery.image, image);
+  assert.equal(delivery.readAt, null);
+  assert.equal(delivery.closedAt, null);
+  assert.equal(current.characters.ana.items.length, 5);
+  await client.emit("inspection:markRead", { characterId: "ana", deliveryId: delivery.id });
+  await client.emit("inspection:finish", { characterId: "ana", deliveryId: delivery.id });
+  await client.emit("inspection:deleteDocument", { id: doc.id });
+  current = await state();
+  assert.ok(!current.inspectionDocuments.find((d) => d.id === doc.id));
+  assert.ok(current.characters.ana.inspectionDeliveries.find((d) => d.id === delivery.id)?.closedAt);
+  assert.equal(current.characters.ana.inspectionDeliveries.find((d) => d.id === delivery.id).body, delivery.body);
 });

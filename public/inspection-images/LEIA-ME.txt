@@ -1,0 +1,6 @@
+IMAGENS DE INSPEÇÃO — UMA NOITE NO INFERNO
+
+Coloque aqui PNGs transparentes, WebPs ou JPGs dos documentos.
+Também é possível enviar imagens pelo painel do mestre; o servidor salva os arquivos automaticamente nesta pasta.
+Arquivos já enviados devem permanecer aqui quando o projeto for atualizado.
+Não coloque dados sensíveis: estas imagens são acessíveis por URL a quem consegue acessar o servidor.
