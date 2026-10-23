@@ -52,7 +52,7 @@ test('todos os arquivos de substituição têm OGG real válido', () => {
   const names = [
     'killer-alheio','killer-exausto','killer-exposto','killer-incapacitado','killer-quebrado','killer-sorte','killer-ferida-profunda',
     'stack-add','stack-remove','killer-JUMPSCARE1','killer-JUMPSCARE2','state-ferido','state-machucado','state-morrendo','state-morto1','state-morto2',
-    'dice-reveal-1','dice-reveal-2-19','dice-reveal-20','dice-roll'
+    'dice-reveal-1','dice-reveal-2-19','dice-reveal-20'
   ];
   for (const name of names) {
     const bytes = fs.readFileSync(path.join(root, 'public/assets', `${name}.ogg`));
@@ -65,4 +65,13 @@ test('a revelação não é mais disparada por temporizador genérico', () => {
   for (const script of ['public/jogador.js','public/mestre.js','public/overlay.js','public/stream-audio.js']) {
     assert.doesNotMatch(read(script), /setTimeout\(\(\) => window\.NevoaAudio\??\.play\("rollReveal"/);
   }
+});
+
+// A rolagem utiliza o WAV original; o OGG antigo não é mais necessário.
+test('o som inicial da rolagem utiliza o WAV original', () => {
+  const source = read('public/audio.js');
+  assert.match(source, /rollDice: \"\/assets\/dice-roll\.wav\"/);
+  const wav = fs.readFileSync(path.join(root, 'public/assets/dice-roll.wav'));
+  assert.ok(wav.length > 100);
+  assert.equal(wav.toString('ascii', 0, 4), 'RIFF');
 });

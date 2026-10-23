@@ -49,12 +49,20 @@
         '<div class="fx-flash"></div>',
         '<div class="fx-blood"></div>',
         '<div class="fx-scratches"></div>',
-        '<div class="fx-banner">',
-          '<small>EVENTO DO ASSASSINO</small>',
-          '<strong></strong>',
-          '<p></p>',
-          '<em></em>',
-        '</div>'
+        '<section class="fx-event-card" aria-live="polite">',
+          '<img class="fx-event-card__base" src="/assets/event-cards/event-card-basee.png" alt="">',
+          '<img class="fx-event-card__icon" alt="" hidden>',
+          '<div class="fx-event-card__fallback" hidden><span>✦</span></div>',
+          '<div class="fx-event-card__heading">',
+            '<span class="fx-event-card__name"></span>',
+            '<span class="fx-event-card__verb"></span>',
+            '<span class="fx-event-card__effect"></span>',
+          '</div>',
+          '<p class="fx-event-card__description"></p>',
+          '<div class="fx-event-card__scanlines"></div>',
+          '<div class="fx-event-card__tracking"></div>',
+          '<div class="fx-event-card__glitch"></div>',
+        '</section>'
       ].join('');
       document.body.appendChild(l);
     }
@@ -120,7 +128,7 @@
     const generation = animationGeneration;
     const l = layer();
     const fxClasses = `fx-${e.eventKey} fx-${e.intensity || 'medium'} style-${e.styleKey || 'acougueiro'}`;
-    const b = l.querySelector('.fx-banner');
+    const b = l.querySelector('.fx-event-card');
 
     clearTimeout(fadeTimer);
     clearTimeout(clearTimer);
@@ -132,10 +140,24 @@
     l.style.transition = 'none';
     l.style.opacity = '0';
 
-    b.querySelector('strong').textContent = e.label || e.eventKey || '';
-    b.querySelector('p').textContent = e.description || '';
-    b.querySelector('em').textContent = e.targetName ? `ALVO: ${e.targetName}` : '';
-    b.classList.toggle('has-description', Boolean(e.description));
+    // Dados do evento chegam pelo mesmo Socket.IO já usado para os FX.
+    // Somente a apresentação muda; nunca interpretar HTML vindo da rede.
+    const card = window.NevoaEventCards?.present(e);
+    if(card){
+      b.querySelector('.fx-event-card__name').textContent = card.character;
+      b.querySelector('.fx-event-card__verb').textContent = card.verb;
+      b.querySelector('.fx-event-card__effect').textContent = card.title;
+      b.querySelector('.fx-event-card__description').textContent = card.description;
+      const icon = b.querySelector('.fx-event-card__icon');
+      const fallback = b.querySelector('.fx-event-card__fallback');
+      icon.hidden = !card.icon;
+      if(card.icon) icon.src = card.icon;
+      fallback.hidden = Boolean(card.icon);
+      fallback.querySelector('span').textContent = card.fallback;
+      b.classList.toggle('is-positive', card.isPositive);
+      b.classList.toggle('is-long', card.isLong);
+      b.classList.toggle('is-very-long', card.isVeryLong);
+    }
 
     // Força uma leitura de layout antes da entrada para garantir reinício limpo.
     void l.offsetWidth;
@@ -161,10 +183,11 @@
         l.className = 'scene-fx-layer';
         l.style.transition = 'none';
         l.style.opacity = '0';
-        b.querySelector('strong').textContent = '';
-        b.querySelector('p').textContent = '';
-        b.querySelector('em').textContent = '';
-        b.classList.remove('has-description');
+        b.querySelector('.fx-event-card__name').textContent = '';
+        b.querySelector('.fx-event-card__verb').textContent = '';
+        b.querySelector('.fx-event-card__effect').textContent = '';
+        b.querySelector('.fx-event-card__description').textContent = '';
+        b.classList.remove('is-positive', 'is-long', 'is-very-long');
       }, 720);
     }, 4300);
 

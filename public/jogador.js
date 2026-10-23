@@ -56,8 +56,15 @@ const isTouchDevice = window.matchMedia?.("(pointer: coarse)")?.matches || false
 // eventos do OBS, dados e recursos continuam nos canais anteriores.
 const CONDITION_SOUND_TYPES = new Set(CAT.effects.map((effect) => effect.audio).filter(Boolean));
 let lastConditionAudioEventId = 0;
+// Após o primeiro gesto, eventos de dano enviados pelo mestre podem tocar
+// automaticamente na ficha; sem interação prévia o navegador pode bloquear som.
+document.addEventListener("pointerdown", () => window.NevoaAudio?.unlock?.(), { once: true, passive: true });
 const GLOBAL_SOUND_TYPES = new Set(["killerJumpscare1", "killerJumpscare2"]);
 const EXTRA_SOUND_EVENTS = {
+  // O alvo ouve o Estado de Saúde tanto pela ficha quanto pelo painel do mestre.
+  "state-ferido": ["stateFerido", 0.70],
+  "state-machucado": ["stateMachucado", 0.78],
+  "state-morrendo": ["stateMorrendo", 0.86],
   killerJumpscare1: ["killerJumpscare1", 1],
   killerJumpscare2: ["killerJumpscare2", 1],
   "state-morto1": ["stateMorto1", 0.80],
@@ -124,16 +131,6 @@ function primeRollsFromState(incomingState) {
 
 function svg(key) {
   return CAT.svg[key] || CAT.svg.star || "";
-}
-function conditionForMarks(marks) {
-  if (marks <= 0) return "saudavel";
-  if (marks === 1) return "ferido";
-  if (marks === 2) return "machucado";
-  return "morrendo";
-}
-function playConditionSound(condition) {
-  window.NevoaAudio?.unlock();
-  window.NevoaAudio?.playState(condition, condition === "morto" ? 0.8 : 0.7);
 }
 function stackChange(resource, currentStacks) {
   if (!Object.prototype.hasOwnProperty.call(previousStacks, resource)) return { changedIndex: null, changeType: "" };
@@ -412,8 +409,8 @@ function handleAction(button) {
   }
   if (action === "set-marks") {
     const nextMarks = Number(button.dataset.marks);
-    const currentMarks = character?.marcasEstado ?? 0;
-    if (nextMarks > currentMarks) playConditionSound(conditionForMarks(nextMarks));
+    // Áudio único confirmado pelo servidor; sem playback local duplicado.
+    window.NevoaAudio?.unlock?.();
     socket.emit("character:setMarks", { id, marcasEstado: nextMarks });
   }
   if (action === "set-dead") {

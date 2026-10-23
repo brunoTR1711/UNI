@@ -1,6 +1,11 @@
 const socket = window.nevoaSocket || (window.nevoaSocket = io());
 // O servidor determina a variante do áudio uma única vez, para PC, tablet e OBS.
 const MASTER_RESULT_SOUNDS = {
+  // Som das caixas de saúde sempre segue o estado resultante enviado pelo servidor,
+  // independentemente de dano causado no mestre ou marcas alteradas na ficha.
+  "state-ferido": ["stateFerido", 0.70],
+  "state-machucado": ["stateMachucado", 0.78],
+  "state-morrendo": ["stateMorrendo", 0.86],
   "state-morto1": ["stateMorto1", 0.78],
   "state-morto2": ["stateMorto2", 0.78],
   "roll-reveal-1": ["rollReveal1", 0.46],
@@ -10,6 +15,7 @@ const MASTER_RESULT_SOUNDS = {
   killerJumpscare2: ["killerJumpscare2", 1]
 };
 let lastMasterResultAudioId = 0;
+document.addEventListener("pointerdown", () => window.NevoaAudio?.unlock?.(), { once: true, passive: true });
 socket.on("audio:event", (event) => {
   const sound = MASTER_RESULT_SOUNDS[event?.type];
   if (!sound || (event.id && event.id <= lastMasterResultAudioId)) return;
@@ -449,23 +455,13 @@ function animateDiceResults(container) {
     diceTimers.set(key, timer);
   });
 }
-function conditionForMarks(marks) {
-  if (marks <= 0) return "saudavel";
-  if (marks === 1) return "ferido";
-  if (marks === 2) return "machucado";
-  return "morrendo";
-}
-function playState(condition) {
-  window.NevoaAudio?.unlock();
-  window.NevoaAudio?.playState(condition, condition === "morto" ? 0.78 : 0.66);
-}
 function handleAction(b) {
   const id = b.dataset.id;
   const action = b.dataset.action;
   if (action === "set-marks") {
     const nextMarks = Number(b.dataset.marks);
-    const current = state.characters?.[id]?.marcasEstado ?? 0;
-    if (nextMarks > current) playState(conditionForMarks(nextMarks));
+    // Apenas o servidor emite o áudio; evita tocar duas vezes no mesmo painel.
+    window.NevoaAudio?.unlock?.();
     socket.emit("character:setMarks", { id, marcasEstado: nextMarks, role: "master" });
   }
   if (action === "set-dead") {
@@ -538,6 +534,9 @@ document.querySelectorAll("[data-threat]").forEach((button) => {
     const targetId = requireTarget(selectedDamageTargetId());
     if (!targetId) return;
     const kind = button.dataset.threat;
+    // O gesto libera o áudio do navegador do mestre; quem escolhe o som é o
+    // servidor, depois de calcular o novo Estado de Saúde do personagem.
+    window.NevoaAudio?.unlock?.();
     if (kind === "damage-light") socket.emit("assassin:damageTarget", { id: THREAT_ID, targetCharacterId: targetId, amount: 1 });
     if (kind === "damage-heavy") socket.emit("assassin:damageTarget", { id: THREAT_ID, targetCharacterId: targetId, amount: 2 });
     if (kind === "damage-mortal") socket.emit("assassin:damageTarget", { id: THREAT_ID, targetCharacterId: targetId, amount: 3 });

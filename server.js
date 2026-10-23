@@ -23,7 +23,7 @@ const PORTRAIT_DIR = path.join(UPLOADS_DIR, "portraits");
 // Coleção independente das imagens de documentos (PNG com transparência preservada).
 const INSPECTION_IMAGES_DIR = path.join(PUBLIC_DIR, "inspection-images");
 fs.mkdirSync(INSPECTION_IMAGES_DIR, { recursive: true });
-const APP_VERSION = "v69-jumpscare-global";
+const APP_VERSION = "v72-status-audio-sincronizado";
 const DICE_ANIMATION_MS = 3000;
 const { deathAudioType, diceRevealAudioType } = require("./lib/sound-rules");
 const { chooseJumpscare } = require("./lib/jumpscare-rules");
@@ -507,12 +507,21 @@ function upsertEffect(character, effect) {
 function removeEffect(character, key) {
   character.effects = character.effects.filter((entry) => entry?.key !== key);
 }
+// Uma única origem para o áudio dos Estados de Saúde: tanto a ficha quanto
+// Causar Dano do mestre chamam este mesmo caminho após atualizar as marcas.
+// O som corresponde ao estado FINAL (1=Ferido, 2=Machucado, 3=Morrendo),
+// mesmo quando um golpe avança mais de uma caixa de uma só vez.
+function emitHealthStateAudio(character, previousMarks) {
+  if (character.morto || character.marcasEstado <= previousMarks) return;
+  if (!["ferido", "machucado", "morrendo"].includes(character.estado)) return;
+  emitAudio(`state-${character.estado}`, { characterId: character.id, estado: character.estado });
+}
 function damageCharacter(character, delta) {
   const previous = character.marcasEstado;
   character.marcasEstado = Math.max(0, Math.min(3, character.marcasEstado + delta));
   character.morto = false;
   character.estado = calculateCondition(character.marcasEstado, false);
-  if (character.marcasEstado > previous) emitAudio(`state-${character.estado}`, { characterId: character.id });
+  emitHealthStateAudio(character, previous);
 }
 function itemChangeAudio(characterId, previous, next) {
   if (previous === next) return;
@@ -750,7 +759,7 @@ io.on("connection", (socket) => {
     character.marcasEstado = Math.max(0, Math.min(3, Number(marcasEstado) || 0));
     character.morto = false;
     character.estado = calculateCondition(character.marcasEstado);
-    if (character.marcasEstado > previous) emitAudio(`state-${character.estado}`, { characterId: character.id });
+    emitHealthStateAudio(character, previous);
     emitState();
   });
   socket.on("character:setDead", ({ id, dead = true, role = "player" }) => {

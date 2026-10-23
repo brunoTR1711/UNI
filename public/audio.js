@@ -18,9 +18,9 @@
     killerJumpscare1: "/assets/killer-JUMPSCARE1.ogg",
     killerJumpscare2: "/assets/killer-JUMPSCARE2.ogg",
     // Outros sons cênicos existentes continuam intactos.
-    killerHitLight: "/assets/killer-hit-light.wav",
-    killerHitHeavy: "/assets/killer-hit-heavy.wav",
-    killerCritical: "/assets/killer-critical.wav",
+    killerHitLight: "/assets/state-ferido.ogg",
+    killerHitHeavy: "/assets/state-machucado.ogg",
+    killerCritical: "/assets/state-morrendo.ogg",
     killerChase: "/assets/killer-chase.wav",
     killerChaseEnd: "/assets/killer-chase-end.wav",
     killerApparition: "/assets/killer-apparition.wav",
