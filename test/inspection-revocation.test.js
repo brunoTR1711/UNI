@@ -34,6 +34,8 @@ function boot(seed) {
       if (id === 'http') return { createServer: () => server };
       if (id === 'socket.io') return { Server: class { constructor() { return io; } } };
       if (id === 'os') return { networkInterfaces: () => ({}) };
+      if (id === './lib/sound-rules') return require('../lib/sound-rules');
+      if (id === './lib/jumpscare-rules') return require('../lib/jumpscare-rules');
       return { fs, path, crypto }[id];
     }
   });
@@ -100,5 +102,27 @@ test('excluir no mestre revoga lidos, pendentes e apresentação, sem afetar out
     assert.ok(app.events.some(e => e.name === 'inspection:presentation' && e.data.action === 'close' && e.data.id === presentationId));
     assert.ok(app.events.some(e => e.name === 'state:update' && e.data.inspectionPresentation === null));
     assert.equal(app.invoke('inspection:markRead', { characterId: 'bia', deliveryId: pending.id }).ok, false);
+  } finally { app.cleanup(); }
+});
+
+test('jumpscare global envia a mesma faixa para todos, sem modificar o estado', () => {
+  const app = boot({ characters: { ana: { id: 'ana', nome: 'Ana' } }, assassins: {}, sceneHistory: [], inspectionDocuments: [] });
+  try {
+    const before = JSON.stringify(app.getState().characters);
+    const response = app.invoke('jumpscare:trigger', { variant: '2' });
+    assert.equal(response.ok, true);
+    assert.equal(response.variant, 2);
+    const presentation = app.events.find(e => e.name === 'jumpscare:event');
+    const audio = app.events.find(e => e.name === 'audio:event');
+    assert.equal(presentation.data.kind, 'audio');
+    assert.equal(presentation.data.scope, 'global');
+    assert.equal(presentation.data.visual, null);
+    assert.equal(presentation.data.audioType, 'killerJumpscare2');
+    assert.equal(audio.data.type, presentation.data.audioType);
+    assert.equal(audio.data.global, true);
+    assert.equal(audio.data.jumpscareEventId, presentation.data.id);
+    assert.equal(JSON.stringify(app.getState().characters), before);
+    assert.equal(app.invoke('jumpscare:trigger', { variant: '3' }).ok, false);
+    assert.equal(app.invoke('jumpscare:trigger', { variant: '1' }).ok, false); // proteção contra duplo clique
   } finally { app.cleanup(); }
 });

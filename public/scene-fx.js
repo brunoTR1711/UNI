@@ -34,7 +34,8 @@
     killerChase:'killerChase', killerChaseEnd:'killerChaseEnd', killerApparition:'killerApparition',
     killerBreak:'killerBreak', killerDrag:'killerDrag', killerSpecial:'killerSpecial',
     killerTorment:'killerTorment', killerExecution:'killerExecution', killerPhase:'killerPhase',
-    killerExposed:'killerExposed', killerMark:'killerMark', killerMiss:'killerMiss'
+    killerExposed:'killerExposed', killerMark:'killerMark', killerMiss:'killerMiss',
+    effectFeridaProfunda:'effectFeridaProfunda', effectQuebrado:'effectQuebrado', effectIncapacitado:'effectIncapacitado', effectExposto:'effectExposto', effectAlheio:'effectAlheio', effectExaustao:'effectExaustao', effectSorte:'effectSorte'
   };
 
   function layer(){
@@ -170,6 +171,18 @@
     play(e);
     document.dispatchEvent(new CustomEvent('nevoa:scene-event', { detail:e }));
   }
+
+  // Efeitos globais exclusivamente sonoros. A camada /efeitos os reproduz,
+  // mas overlays individuais são atendidos por overlay.js (sem duplicação).
+  let lastJumpscareAudioId = 0;
+  socket.on('audio:event', (event) => {
+    if (viewMode !== 'effects-global' && viewMode !== 'effects-target' && viewMode !== 'assassin-overlay') return;
+    if (event?.type !== 'killerJumpscare1' && event?.type !== 'killerJumpscare2') return;
+    if (event.id && event.id <= lastJumpscareAudioId) return;
+    lastJumpscareAudioId = event.id || lastJumpscareAudioId + 1;
+    if (!window.NevoaAudio?.isUnlocked?.()) { panel(); return; }
+    window.NevoaAudio?.play?.(event.type, 1);
+  });
 
   socket.on('scene:event', (e)=>{
     if(!e || !Number.isFinite(Number(e.id)) || Number(e.id) <= last) return;

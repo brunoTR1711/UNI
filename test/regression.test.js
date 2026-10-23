@@ -46,6 +46,7 @@ async function send(name, data) {
 before(async () => {
   directory = fs.mkdtempSync(path.join(os.tmpdir(), "uni-regression-"));
   fs.copyFileSync(path.join(root, "server.js"), path.join(directory, "server.js"));
+  fs.cpSync(path.join(root, "lib"), path.join(directory, "lib"), { recursive: true });
   fs.cpSync(path.join(root, "public"), path.join(directory, "public"), {
     recursive: true,
     filter: (source) => path.basename(source) !== "uploads"
@@ -154,6 +155,9 @@ test("rolagens mantêm resultado, eventos e duração; alterações rápidas sã
   assert.ok(events.some(([name, data]) => name === "dice:roll" && data.roll.id === roll.id));
   assert.ok(events.some(([name, data]) => name === "dice:frame" && !data.final));
   assert.ok(events.some(([name, data]) => name === "dice:reveal" && data.value === roll.value));
+  const expectedReveal = roll.value === 1 ? "roll-reveal-1" : roll.value === 20 ? "roll-reveal-20" : "roll-reveal-2-19";
+  assert.ok(events.some(([name, data]) => name === "audio:event" && data.type === expectedReveal && data.rollId === roll.id),
+    "Deve emitir o áudio certo só depois do resultado final");
 });
 
 test("assassino e comandos de cena continuam afetando o alvo", async () => {

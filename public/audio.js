@@ -1,13 +1,23 @@
 (function () {
   const sounds = {
-    gained: "/assets/stack-add.wav",
-    lost: "/assets/stack-remove.wav",
-    stateFerido: "/assets/state-ferido.wav",
-    stateMachucado: "/assets/state-machucado.wav",
-    stateMorrendo: "/assets/state-morrendo.wav",
-    stateMorto: "/assets/state-morto-flatline.wav",
-    rollDice: "/assets/dice-roll.wav",
-    rollReveal: "/assets/dice-reveal.wav",
+    // Sons personalizados pelo usuário. Os arquivos OGG deste pacote são modelos silenciosos.
+    gained: "/assets/stack-add.ogg",
+    lost: "/assets/stack-remove.ogg",
+    stateFerido: "/assets/state-ferido.ogg",
+    stateMachucado: "/assets/state-machucado.ogg",
+    stateMorrendo: "/assets/state-morrendo.ogg",
+    stateMorto1: "/assets/state-morto1.ogg",
+    stateMorto2: "/assets/state-morto2.ogg",
+    rollDice: "/assets/dice-roll.wav", // Som original das rolagens (v67 e anteriores).
+    rollReveal1: "/assets/dice-reveal-1.ogg",
+    rollReveal2to19: "/assets/dice-reveal-2-19.ogg",
+    rollReveal20: "/assets/dice-reveal-20.ogg",
+    // Compatibilidade com chamadas antigas de áudio que não identificam o resultado.
+    stateMorto: "/assets/state-morto1.ogg",
+    rollReveal: "/assets/dice-reveal-2-19.ogg",
+    killerJumpscare1: "/assets/killer-JUMPSCARE1.ogg",
+    killerJumpscare2: "/assets/killer-JUMPSCARE2.ogg",
+    // Outros sons cênicos existentes continuam intactos.
     killerHitLight: "/assets/killer-hit-light.wav",
     killerHitHeavy: "/assets/killer-hit-heavy.wav",
     killerCritical: "/assets/killer-critical.wav",
@@ -22,7 +32,14 @@
     killerPhase: "/assets/killer-phase.wav",
     killerExposed: "/assets/killer-exposed.wav",
     killerMark: "/assets/killer-mark.wav",
-    killerMiss: "/assets/killer-miss.wav"
+    killerMiss: "/assets/killer-miss.wav",
+    effectFeridaProfunda: "/assets/killer-ferida-profunda.ogg",
+    effectQuebrado: "/assets/killer-quebrado.ogg",
+    effectIncapacitado: "/assets/killer-incapacitado.ogg",
+    effectExposto: "/assets/killer-exposto.ogg",
+    effectAlheio: "/assets/killer-alheio.ogg",
+    effectExaustao: "/assets/killer-exausto.ogg",
+    effectSorte: "/assets/killer-sorte.ogg"
   };
 
   const buffers = new Map();
@@ -49,7 +66,7 @@
     const promise = (async () => {
       const context = getAudioContext();
       if (!context) return null;
-      const response = await fetch(url, { cache: "force-cache" });
+      const response = await fetch(url, { cache: url.endsWith(".ogg") ? "no-cache" : "force-cache" });
       if (!response.ok) throw new Error(`Falha ao carregar ${url}`);
       const arrayBuffer = await response.arrayBuffer();
       const decoded = await context.decodeAudioData(arrayBuffer);

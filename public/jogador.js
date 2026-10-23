@@ -52,6 +52,29 @@ const {
 } = window.NevoaCommon.createDiceController();
 const isTouchDevice = window.matchMedia?.("(pointer: coarse)")?.matches || false;
 
+// Cada condição tem seu próprio som. A ficha só toca eventos do seu personagem;
+// eventos do OBS, dados e recursos continuam nos canais anteriores.
+const CONDITION_SOUND_TYPES = new Set(CAT.effects.map((effect) => effect.audio).filter(Boolean));
+let lastConditionAudioEventId = 0;
+const GLOBAL_SOUND_TYPES = new Set(["killerJumpscare1", "killerJumpscare2"]);
+const EXTRA_SOUND_EVENTS = {
+  killerJumpscare1: ["killerJumpscare1", 1],
+  killerJumpscare2: ["killerJumpscare2", 1],
+  "state-morto1": ["stateMorto1", 0.80],
+  "state-morto2": ["stateMorto2", 0.80],
+  "roll-reveal-1": ["rollReveal1", 0.50],
+  "roll-reveal-2-19": ["rollReveal2to19", 0.48],
+  "roll-reveal-20": ["rollReveal20", 0.54]
+};
+socket.on("audio:event", (event) => {
+  if (!event || (!GLOBAL_SOUND_TYPES.has(event.type) && event.characterId !== id)) return;
+  const sound = CONDITION_SOUND_TYPES.has(event.type) ? [event.type, 0.68] : EXTRA_SOUND_EVENTS[event.type];
+  if (!sound) return;
+  if (event.id && event.id <= lastConditionAudioEventId) return;
+  lastConditionAudioEventId = event.id || lastConditionAudioEventId + 1;
+  window.NevoaAudio?.play?.(sound[0], sound[1]);
+});
+
 socket.emit("character:create", { id });
 socket.on("state:update", (incoming) => {
   state = incoming;
@@ -394,7 +417,7 @@ function handleAction(button) {
     socket.emit("character:setMarks", { id, marcasEstado: nextMarks });
   }
   if (action === "set-dead") {
-    playConditionSound("morto");
+    window.NevoaAudio?.unlock?.();
     socket.emit("character:setDead", { id, dead: true });
   }
   if (action === "set-stacks") {
@@ -407,7 +430,6 @@ function handleAction(button) {
   if (action === "roll-d20") {
     window.NevoaAudio?.unlock();
     window.NevoaAudio?.play("rollDice", 0.62);
-    setTimeout(() => window.NevoaAudio?.play("rollReveal", 0.48), 3000);
     socket.emit("resource:rollD20", { id, resource: button.dataset.resource });
   }
 }

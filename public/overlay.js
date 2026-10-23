@@ -45,13 +45,20 @@ let lastOverlayAudioEventId = 0;
 let pendingOverlayAudioEvents = [];
 
 const OVERLAY_AUDIO_MAP = {
+  killerJumpscare1: ["killerJumpscare1", 1],
+  killerJumpscare2: ["killerJumpscare2", 1],
   gained: ["gained", 0.74],
   lost: ["lost", 0.80],
   "state-ferido": ["stateFerido", 0.80],
   "state-machucado": ["stateMachucado", 0.86],
   "state-morrendo": ["stateMorrendo", 0.90],
   "state-morto": ["stateMorto", 0.96],
+  "state-morto1": ["stateMorto1", 0.96],
+  "state-morto2": ["stateMorto2", 0.96],
   "roll-dice": ["rollDice", 0.82],
+  "roll-reveal-1": ["rollReveal1", 0.66],
+  "roll-reveal-2-19": ["rollReveal2to19", 0.62],
+  "roll-reveal-20": ["rollReveal20", 0.74],
   killerHitLight: ["killerHitLight", 0.76],
   killerHitHeavy: ["killerHitHeavy", 0.84],
   killerCritical: ["killerCritical", 0.92],
@@ -66,7 +73,14 @@ const OVERLAY_AUDIO_MAP = {
   killerPhase: ["killerPhase", 0.90],
   killerExposed: ["killerExposed", 0.80],
   killerMark: ["killerMark", 0.78],
-  killerMiss: ["killerMiss", 0.68]
+  killerMiss: ["killerMiss", 0.68],
+  effectFeridaProfunda: ["effectFeridaProfunda", 0.78],
+  effectQuebrado: ["effectQuebrado", 0.78],
+  effectIncapacitado: ["effectIncapacitado", 0.78],
+  effectExposto: ["effectExposto", 0.78],
+  effectAlheio: ["effectAlheio", 0.78],
+  effectExaustao: ["effectExaustao", 0.78],
+  effectSorte: ["effectSorte", 0.78]
 };
 function svg(key) { return CAT.svg[key] || CAT.svg.star || ""; }
 function eventMatchesThisOverlay(event) { if (!event) return false; if (!singleId) return true; return !event.characterId || event.characterId === singleId; }
@@ -108,7 +122,8 @@ async function playOverlayAudioEvent(event) {
     return;
   }
   await window.NevoaAudio.play(config[0], config[1]);
-  if (event.type === "roll-dice") setTimeout(() => { if (overlayAudioEnabled && window.NevoaAudio?.isUnlocked?.()) window.NevoaAudio.play("rollReveal", 0.62); }, 3000);
+  // A revelação é um segundo evento emitido pelo servidor com o resultado real.
+  // Evita tocar um som genérico por timer em cada navegador.
 }
 function flushOverlayAudioQueue() {
   if (!overlayAudioEnabled || !window.NevoaAudio?.isUnlocked?.()) return;

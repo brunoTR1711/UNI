@@ -139,3 +139,11 @@ Para problemas de som, use os testes de `/audio`, confira a ativação por inter
 ## Documentos para inspeção
 
 O painel do mestre inclui **Inspeção de documentos** para criar bilhetes/arquivos com imagem e texto, e entregá-los a um ou mais sobreviventes. A ficha apresenta a imagem com animação breve, botão **LER** e histórico textual separado do inventário. Imagens são armazenadas em `public/inspection-images/` e não perdem a transparência PNG. Veja [guia de inspeção](docs/inspecao-de-documentos.md). **v66:** excluir um documento do catálogo também remove sua leitura e entregas de todas as fichas, inclusive históricos antigos, e encerra sua apresentação no FX. Na atualização do tablet, preserve também essa pasta de imagens.
+
+## Sons individuais de condições (v67)
+
+Cada um dos sete efeitos aplicáveis aos jogadores tem um `.ogg` próprio na pasta `public/assets/effects/`. Os modelos incluídos são **silenciosos e reproduzíveis**: substitua pelos seus arquivos reais com o mesmo nome. Consulte [Sons por efeito](docs/sons-por-efeito.md) para a tabela completa e orientações para atualizar no GitHub/Termux.
+
+## Jumpscare sonoro global (v69)
+
+No painel do mestre (`/mestre`) selecione **Jumpscare → Aleatório, Som 1 ou Som 2** e clique em **DISPARAR JUMPSCARE**. Todos os jogadores conectados e canais de áudio da transmissão recebem o mesmo som. Para substituir os modelos silenciosos, use `public/assets/killer-JUMPSCARE1.ogg` e `killer-JUMPSCARE2.ogg`. O evento separado `jumpscare:event` reserva campo visual para efeitos posteriores; veja `docs/jumpscare-v69.md`.

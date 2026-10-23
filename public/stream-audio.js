@@ -17,7 +17,12 @@ const map = {
   "state-machucado": ["stateMachucado", 0.86, "MACHUCADO"],
   "state-morrendo": ["stateMorrendo", 0.90, "MORRENDO"],
   "state-morto": ["stateMorto", 0.96, "MORTO"],
+  "state-morto1": ["stateMorto1", 0.96, "MORTO 1"],
+  "state-morto2": ["stateMorto2", 0.96, "MORTO 2"],
   "roll-dice": ["rollDice", 0.82, "DADO"],
+  "roll-reveal-1": ["rollReveal1", 0.66, "DADO — 1"],
+  "roll-reveal-2-19": ["rollReveal2to19", 0.62, "DADO — 2 A 19"],
+  "roll-reveal-20": ["rollReveal20", 0.74, "DADO — 20"],
   killerHitLight: ["killerHitLight", 0.76, "IMPACTO LEVE"],
   killerHitHeavy: ["killerHitHeavy", 0.84, "IMPACTO PESADO"],
   killerCritical: ["killerCritical", 0.92, "GOLPE CRÍTICO"],
@@ -32,7 +37,16 @@ const map = {
   killerPhase: ["killerPhase", 0.90, "NOVA FASE"],
   killerExposed: ["killerExposed", 0.80, "EXPOSTO"],
   killerMark: ["killerMark", 0.78, "ALVO MARCADO"],
-  killerMiss: ["killerMiss", 0.68, "GOLPE ERRADO"]
+  killerMiss: ["killerMiss", 0.68, "GOLPE ERRADO"],
+  effectFeridaProfunda: ["effectFeridaProfunda", 0.78, "FERIDA PROFUNDA"],
+  effectQuebrado: ["effectQuebrado", 0.78, "QUEBRADO"],
+  effectIncapacitado: ["effectIncapacitado", 0.78, "INCAPACITADO"],
+  effectExposto: ["effectExposto", 0.78, "EXPOSTO"],
+  effectAlheio: ["effectAlheio", 0.78, "ALHEIO"],
+  effectExaustao: ["effectExaustao", 0.78, "EXAUSTÃO"],
+  effectSorte: ["effectSorte", 0.78, "SORTE"],
+  killerJumpscare1: ["killerJumpscare1", 1, "JUMPSCARE 1"],
+  killerJumpscare2: ["killerJumpscare2", 1, "JUMPSCARE 2"]
 };
 
 function updateDiagnostic() {
@@ -73,11 +87,7 @@ async function playEvent(type) {
   lastEventLabel.textContent = config[2];
   await window.NevoaAudio.play(config[0], config[1]);
 
-  if (type === "roll-dice") {
-    setTimeout(() => {
-      if (enabled) window.NevoaAudio?.play?.("rollReveal", 0.62);
-    }, 3000);
-  }
+
 }
 
 function flushQueue() {
@@ -90,7 +100,7 @@ enableButton.addEventListener("click", enableAudio);
 document.getElementById("test-gain").addEventListener("click", async () => { await enableAudio(); playEvent("gained"); });
 document.getElementById("test-loss").addEventListener("click", async () => { await enableAudio(); playEvent("lost"); });
 document.getElementById("test-damage").addEventListener("click", async () => { await enableAudio(); playEvent("state-machucado"); });
-document.getElementById("test-dice").addEventListener("click", async () => { await enableAudio(); playEvent("roll-dice"); });
+document.getElementById("test-dice").addEventListener("click", async () => { await enableAudio(); playEvent("roll-dice"); setTimeout(() => playEvent("roll-reveal-2-19"), 3000); });
 
 socket.on("connect", () => {
   connectionLabel.textContent = "ONLINE";

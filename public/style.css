@@ -4563,3 +4563,15 @@ textarea{
   .cabana-header{padding:.4rem .35rem .8rem!important}
   .cabana-portrait{border-width:3px!important}
 }
+
+/* v69 · Disparo sonoro global de jumpscare no mestre */
+.master-jumpscare-panel { border-color:rgba(216,72,83,.36)!important; }
+.master-jumpscare-panel .vhs-block-head h2 { color:#f4e7e8; }
+.master-jumpscare-hint { color:#b9c3c8; font-size:12px; line-height:1.5; margin:7px 0 12px; }
+.master-jumpscare-label { display:block; color:#adbac1; font-size:11px; font-weight:800; letter-spacing:.11em; text-transform:uppercase; margin-bottom:5px; }
+.master-jumpscare-panel .dark-input { display:block; width:100%; max-width:100%; margin-bottom:10px; }
+.master-jumpscare-trigger { display:block; width:100%; min-height:44px; border:1px solid rgba(255,110,124,.55)!important; border-radius:7px; color:#fff!important; background:linear-gradient(180deg,#73252d,#361116)!important; font-weight:900; letter-spacing:.07em; cursor:pointer; transition:background .15s,filter .15s; }
+.master-jumpscare-trigger:hover:not(:disabled) { filter:brightness(1.19); }
+.master-jumpscare-trigger:disabled { opacity:.6; cursor:wait; }
+.master-jumpscare-trigger:focus-visible { outline:2px solid #f7b3b7; outline-offset:3px; }
+.master-jumpscare-status { min-height:1.4em; margin:8px 0 0; font-size:11px; color:#9ec0c5; font-family:monospace; }

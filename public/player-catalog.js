@@ -88,13 +88,13 @@
     { key:'distracao-1', categoria:'distracao', nome:'Distração — 1 carga', icon:'target', max:1, descricao:ITEM_EFFECTS.distracao }
   ];
   const effects = [
-    { key:'ferida-profunda', nome:'Ferida Profunda', icon:'drop', negative:true, descricao:'Perde 1 Fôlego por rodada até ser curado. Encerra ao chegar a 0 Fôlego.'},
-    { key:'quebrado', nome:'Quebrado', icon:'broken', negative:true, descricao:'Não recupera Estados de Saúde.'},
-    { key:'incapacitado', nome:'Incapacitado', icon:'asleep', negative:true, descricao:'Não pode usar ações para atordoar ou cegar.'},
-    { key:'exposto', nome:'Exposto', icon:'skull', negative:true, descricao:'O próximo golpe leva diretamente a Em Risco. Se já estiver Em Risco, morre.'},
-    { key:'alheio', nome:'Alheio', icon:'face', negative:true, descricao:'Não pode ficar de tocaia nem resistir.'},
-    { key:'exaustao', nome:'Exaustão', icon:'exhaust', negative:true, descricao:'Não pode realizar ações que causem exaustão.'},
-    { key:'sorte', nome:'Sorte', icon:'clover', negative:false, descricao:'Recebe 1 rerrolagem extra para usar quando quiser.'}
+    { key:'ferida-profunda', nome:'Ferida Profunda', audio:'effectFeridaProfunda', icon:'drop', negative:true, descricao:'Perde 1 Fôlego por rodada até ser curado. Encerra ao chegar a 0 Fôlego.'},
+    { key:'quebrado', nome:'Quebrado', audio:'effectQuebrado', icon:'broken', negative:true, descricao:'Não recupera Estados de Saúde.'},
+    { key:'incapacitado', nome:'Incapacitado', audio:'effectIncapacitado', icon:'asleep', negative:true, descricao:'Não pode usar ações para atordoar ou cegar.'},
+    { key:'exposto', nome:'Exposto', audio:'effectExposto', icon:'skull', negative:true, descricao:'O próximo golpe leva diretamente a Em Risco. Se já estiver Em Risco, morre.'},
+    { key:'alheio', nome:'Alheio', audio:'effectAlheio', icon:'face', negative:true, descricao:'Não pode ficar de tocaia nem resistir.'},
+    { key:'exaustao', nome:'Exaustão', audio:'effectExaustao', icon:'exhaust', negative:true, descricao:'Não pode realizar ações que causem exaustão.'},
+    { key:'sorte', nome:'Sorte', audio:'effectSorte', icon:'clover', negative:false, descricao:'Recebe 1 rerrolagem extra para usar quando quiser.'}
   ];
   window.NEVOA_PLAYER_CATALOG = { svg, styles, obscureAdvantages, items, effects };
 })();

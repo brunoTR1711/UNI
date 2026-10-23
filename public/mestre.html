@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <title>Uma Noite no Inferno — Mestre</title>
-  <link rel="stylesheet" href="/style.css?v=63" />
+  <link rel="stylesheet" href="/style.css?v=69" />
   <link rel="stylesheet" href="/inspection.css?v=65" />
 </head>
 <body class="master-page lite-page master-vhs-page">
@@ -52,6 +52,23 @@
         </section>
 
         <section class="vhs-master-block vhs-target-preview" id="target-preview"></section>
+
+        <!-- Som de susto global: não altera saúde nem abre efeito visual. -->
+        <section class="vhs-master-block master-jumpscare-panel" aria-label="Jumpscare global">
+          <header class="vhs-block-head">
+            <small>FX / TRANSMISSÃO</small>
+            <h2>Jumpscare</h2>
+          </header>
+          <p class="master-jumpscare-hint">Som alto, enviado simultaneamente aos jogadores e à stream. Sem imagem nesta versão.</p>
+          <label class="master-jumpscare-label" for="jumpscare-variant">Áudio</label>
+          <select id="jumpscare-variant" class="dark-input">
+            <option value="random">ALEATÓRIO (1 OU 2)</option>
+            <option value="1">JUMPSCARE 1</option>
+            <option value="2">JUMPSCARE 2</option>
+          </select>
+          <button id="jumpscare-trigger" class="master-jumpscare-trigger" type="button">DISPARAR JUMPSCARE</button>
+          <p class="master-jumpscare-status" id="jumpscare-status" role="status" aria-live="polite">Pronto para disparar.</p>
+        </section>
 
         <!-- Catálogo de inspeção: independente dos itens/efeitos do sistema. -->
         <section id="inspection-master-mount" class="vhs-master-block inspection-master-mount"></section>
@@ -117,11 +134,11 @@
 
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/player-catalog.js?v=63"></script>
+  <script src="/player-catalog.js?v=67"></script>
   <script src="/assassin-catalog.js?v=63"></script>
   <script src="/common.js?v=63"></script>
-  <script src="/audio.js?v=63"></script>
-  <script src="/mestre.js?v=63"></script>
+  <script src="/audio.js?v=70"></script>
+  <script src="/mestre.js?v=69"></script>
   <script src="/inspection-master.js?v=66"></script>
 </body>
 </html>

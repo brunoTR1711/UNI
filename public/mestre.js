@@ -1,4 +1,21 @@
 const socket = window.nevoaSocket || (window.nevoaSocket = io());
+// O servidor determina a variante do áudio uma única vez, para PC, tablet e OBS.
+const MASTER_RESULT_SOUNDS = {
+  "state-morto1": ["stateMorto1", 0.78],
+  "state-morto2": ["stateMorto2", 0.78],
+  "roll-reveal-1": ["rollReveal1", 0.46],
+  "roll-reveal-2-19": ["rollReveal2to19", 0.44],
+  "roll-reveal-20": ["rollReveal20", 0.50],
+  killerJumpscare1: ["killerJumpscare1", 1],
+  killerJumpscare2: ["killerJumpscare2", 1]
+};
+let lastMasterResultAudioId = 0;
+socket.on("audio:event", (event) => {
+  const sound = MASTER_RESULT_SOUNDS[event?.type];
+  if (!sound || (event.id && event.id <= lastMasterResultAudioId)) return;
+  lastMasterResultAudioId = event.id || lastMasterResultAudioId + 1;
+  window.NevoaAudio?.play?.(sound[0], sound[1]);
+});
 const Common = window.NevoaCommon;
 const CAT = window.NEVOA_PLAYER_CATALOG;
 const ACAT = window.NEVOA_ASSASSIN_CATALOG || { svg: {}, abilities: [], advantages: [] };
@@ -452,7 +469,7 @@ function handleAction(b) {
     socket.emit("character:setMarks", { id, marcasEstado: nextMarks, role: "master" });
   }
   if (action === "set-dead") {
-    playState("morto");
+    window.NevoaAudio?.unlock?.();
     socket.emit("character:setDead", { id, dead: true, role: "master" });
   }
   if (action === "set-stacks") {
@@ -466,7 +483,6 @@ function handleAction(b) {
   if (action === "roll-d20") {
     window.NevoaAudio?.unlock();
     window.NevoaAudio?.play("rollDice", 0.55);
-    setTimeout(() => window.NevoaAudio?.play("rollReveal", 0.44), 3000);
     socket.emit("resource:rollD20", { id, resource: b.dataset.resource, role: "master" });
   }
   if (action === "remove-effect") {
@@ -493,9 +509,29 @@ function applyEffect(effectKey) {
   socket.emit("assassin:applyEffectToTarget", {
     id: THREAT_ID,
     targetCharacterId: targetId,
-    effect: { ...effect, audio: effect.key === "sorte" ? "killerSpecial" : "killerTorment", intensity: effect.key === "sorte" ? "light" : "medium" }
+    effect: { ...effect, audio: effect.audio || (effect.key === "sorte" ? "killerSpecial" : "killerTorment"), intensity: effect.key === "sorte" ? "light" : "medium" }
   });
 }
+
+// Controle independente de dano, condições, itens e eventos cênicos.
+const jumpscareTrigger = document.getElementById("jumpscare-trigger");
+const jumpscareVariant = document.getElementById("jumpscare-variant");
+const jumpscareStatus = document.getElementById("jumpscare-status");
+jumpscareTrigger?.addEventListener("click", () => {
+  if (jumpscareTrigger.disabled) return;
+  jumpscareTrigger.disabled = true;
+  jumpscareStatus.textContent = "ENVIANDO PARA TODOS...";
+  // Gesto do mestre permite desbloquear o áudio no navegador do mestre.
+  window.NevoaAudio?.unlock?.();
+  socket.timeout(4000).emit("jumpscare:trigger", { variant: jumpscareVariant?.value || "random" }, (error, response) => {
+    if (error || !response?.ok) {
+      jumpscareStatus.textContent = response?.error || "Falha de conexão com o servidor.";
+    } else {
+      jumpscareStatus.textContent = `ENVIADO A TODOS · SOM ${response.variant}`;
+    }
+    setTimeout(() => { jumpscareTrigger.disabled = false; }, 1100);
+  });
+});
 
 document.querySelectorAll("[data-threat]").forEach((button) => {
   button.addEventListener("click", () => {

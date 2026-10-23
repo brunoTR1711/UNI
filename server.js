@@ -23,8 +23,10 @@ const PORTRAIT_DIR = path.join(UPLOADS_DIR, "portraits");
 // Coleção independente das imagens de documentos (PNG com transparência preservada).
 const INSPECTION_IMAGES_DIR = path.join(PUBLIC_DIR, "inspection-images");
 fs.mkdirSync(INSPECTION_IMAGES_DIR, { recursive: true });
-const APP_VERSION = "v66-inspecao-historico-vinculado";
+const APP_VERSION = "v69-jumpscare-global";
 const DICE_ANIMATION_MS = 3000;
+const { deathAudioType, diceRevealAudioType } = require("./lib/sound-rules");
+const { chooseJumpscare } = require("./lib/jumpscare-rules");
 app.use(express.json({ limit: "16mb" }));
 app.use((req, res, next) => {
   // Keep live state fresh; static files can be revalidated without downloading again.
@@ -90,6 +92,17 @@ const SCENE_EVENTS = {
   phaseChange: { label: "NOVA FASE", intensity: "extreme", audio: "killerPhase", bloodlust: 0 },
   execution: { label: "EXECUÇÃO", intensity: "extreme", audio: "killerExecution", bloodlust: 2 }
 };
+// Sons individuais por condição. O servidor escolhe o áudio pelo ID canônico,
+// sem depender da versão de JavaScript carregada no painel de cada dispositivo.
+const PLAYER_EFFECT_AUDIO = Object.freeze({
+  "ferida-profunda": "effectFeridaProfunda",
+  "quebrado": "effectQuebrado",
+  "incapacitado": "effectIncapacitado",
+  "exposto": "effectExposto",
+  "alheio": "effectAlheio",
+  "exaustao": "effectExaustao",
+  "sorte": "effectSorte"
+});
 const TARGETED_SCENE_EVENTS = new Set([
   "attackHit",
   "criticalHit",
@@ -123,6 +136,8 @@ let state = loadState();
 let stateDataMigrated = false;
 let audioSequence = 0;
 let sceneSequence = 0;
+let jumpscareSequence = 0;
+let lastJumpscareTriggeredAt = 0;
 
 let saveTimer = null;
 let saveInProgress = false;
@@ -561,6 +576,29 @@ app.get("/api/network", (_, res) => res.json({ version: APP_VERSION, port: serve
 io.on("connection", (socket) => {
   socket.emit("state:update", state);
 
+  // Jumpscare global: o mesmo arquivo e a mesma variante chegam a todos.
+  // Evento separado dos efeitos cênicos, para não criar banners ou imagens agora.
+  socket.on("jumpscare:trigger", (payload = {}, ack) => {
+    const selection = chooseJumpscare(payload?.variant);
+    if (!selection) return ack?.({ ok: false, error: "Som de jumpscare inválido." });
+    const now = Date.now();
+    if (now - lastJumpscareTriggeredAt < 1000) {
+      return ack?.({ ok: false, error: "Aguarde antes do próximo jumpscare." });
+    }
+    lastJumpscareTriggeredAt = now;
+    const event = {
+      id: ++jumpscareSequence,
+      at: now,
+      ...selection,
+      scope: "global"
+    };
+    // API reservada para imagens/animações futuras: jumpscare:event.
+    io.emit("jumpscare:event", event);
+    // O canal audio:event já atende ficha, overlay, FX e página de áudio do OBS.
+    emitAudio(event.audioType, { jumpscareEventId: event.id, global: true });
+    ack?.({ ok: true, variant: event.variant, eventId: event.id });
+  });
+
   // Documentos investigativos não são itens de inventário. Cada envio guarda
   // o conteúdo recebido, mas só permanece disponível enquanto houver um
   // documento correspondente no catálogo do mestre.
@@ -721,7 +759,7 @@ io.on("connection", (socket) => {
     const was = character.morto;
     character.morto = !!dead;
     character.estado = calculateCondition(character.marcasEstado, character.morto);
-    if (!was && character.morto) emitAudio("state-morto", { characterId: character.id });
+    if (!was && character.morto) emitAudio(deathAudioType(), { characterId: character.id });
     emitState();
   });
   socket.on("character:setLocked", ({ id, locked }) => {
@@ -791,6 +829,7 @@ io.on("connection", (socket) => {
         clearInterval(frameTimer);
         io.emit("dice:frame", { characterId: character.id, resource, rollId, key: rollId, value, final: true });
         io.emit("dice:reveal", { characterId: character.id, resource, rollId, key: rollId, value, final: true });
+        emitAudio(diceRevealAudioType(value), { characterId: character.id, resource, rollId, value });
         return;
       }
       io.emit("dice:frame", { characterId: character.id, resource, rollId, key: rollId, value: Math.floor(Math.random() * 20) + 1, final: false });
@@ -866,8 +905,11 @@ io.on("connection", (socket) => {
   socket.on("character:setEffect", ({ id, effect, enabled = true }) => {
     const character = ensureCharacter(id);
     if (!character || !effect?.key) return;
-    if (enabled) upsertEffect(character, effect);
-    else removeEffect(character, String(effect.key));
+    if (enabled) {
+      upsertEffect(character, effect);
+      const audioType = PLAYER_EFFECT_AUDIO[String(effect.key)];
+      if (audioType) emitAudio(audioType, { characterId: character.id });
+    } else removeEffect(character, String(effect.key));
     emitState();
   });
   socket.on("character:clearEffects", ({ id }) => {
@@ -1002,7 +1044,7 @@ io.on("connection", (socket) => {
     character.marcasEstado = 3;
     character.morto = true;
     character.estado = "morto";
-    emitAudio("state-morto", { characterId: character.id });
+    emitAudio(deathAudioType(), { characterId: character.id });
     emitScene("execution", {
       assassinId: assassin.id,
       targetCharacterId: character.id,
@@ -1028,7 +1070,7 @@ io.on("connection", (socket) => {
       label: effect.nome || effect.name || "EFEITO APLICADO",
       description: effect.descricao || effect.description || "",
       intensity: effect.intensity || "medium",
-      audio: effect.audio || "killerSpecial",
+      audio: PLAYER_EFFECT_AUDIO[String(effect.key)] || effect.audio || "killerSpecial",
       eventKey: `effect-${sanitizeId(effect.key)}`
     });
   });
