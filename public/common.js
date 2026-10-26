@@ -36,6 +36,11 @@
     `
   };
 
+  // Símbolo SVG existente fica visível se o PNG ainda for o placeholder 1x1.
+  for (const key of Object.keys(RESOURCE_ICON)) {
+    RESOURCE_ICON[key] = window.UNIAssetIcons?.render("atributos", key, RESOURCE_ICON[key]) || RESOURCE_ICON[key];
+  }
+
   const CONDITION_LABELS = {
     saudavel: "SAUDÁVEL",
     ferido: "FERIDO",
@@ -208,6 +213,30 @@
 
 
   const THEME_PRESETS = {
+    vermelho: {
+      label: "VERMELHO SANGUE", swatch: "#f12d43",
+      saudavel: { main: "#f12d43", deep: "#450711", accent: "#ff8d9a", dice: "#de2036", glow: "#ff6575" },
+      ferido: { main: "#851f32", deep: "#290910", accent: "#eb2639", dice: "#761a2b", glow: "#ff4053" },
+      machucado: { main: "#43202c", deep: "#18080e", accent: "#78131f", dice: "#43202c", glow: "#c5283b" },
+      morrendo: { main: "#83908e", deep: "#1d2523", accent: "#b8c5c1", dice: "#717d79", glow: "#d5ddda" },
+      morto: { main: "#000000", deep: "#000000", accent: "#111111", dice: "#000000", glow: "#1f1f1f" }
+    },
+    amarelo: {
+      label: "AMARELO NEON", swatch: "#e7f542",
+      saudavel: { main: "#e7f542", deep: "#394007", accent: "#f4ffa2", dice: "#cfdd20", glow: "#efff78" },
+      ferido: { main: "#697825", deep: "#1f2509", accent: "#eb2639", dice: "#606421", glow: "#ff4053" },
+      machucado: { main: "#3b3e1d", deep: "#101309", accent: "#78131f", dice: "#3b3e1d", glow: "#c5283b" },
+      morrendo: { main: "#83908e", deep: "#1d2523", accent: "#b8c5c1", dice: "#717d79", glow: "#d5ddda" },
+      morto: { main: "#000000", deep: "#000000", accent: "#111111", dice: "#000000", glow: "#1f1f1f" }
+    },
+    turquesa: {
+      label: "TURQUESA OCEANO", swatch: "#13d8ad",
+      saudavel: { main: "#13d8ad", deep: "#07483b", accent: "#8dffdf", dice: "#0bbd94", glow: "#74ffe0" },
+      ferido: { main: "#287b68", deep: "#092a24", accent: "#eb2639", dice: "#1b6e5e", glow: "#ff4053" },
+      machucado: { main: "#21483c", deep: "#081714", accent: "#78131f", dice: "#21483c", glow: "#c5283b" },
+      morrendo: { main: "#83908e", deep: "#1d2523", accent: "#b8c5c1", dice: "#717d79", glow: "#d5ddda" },
+      morto: { main: "#000000", deep: "#000000", accent: "#111111", dice: "#000000", glow: "#1f1f1f" }
+    },
     ciano: {
       label: "CIANO ELÉTRICO",
       swatch: "#00d5ff",

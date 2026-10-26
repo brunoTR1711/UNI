@@ -1,3 +1,5 @@
+> **Atenção (v73):** os caminhos abaixo são históricos. Consulte [`organizacao-assets-v73.md`](organizacao-assets-v73.md) para os caminhos atuais.
+
 # UNI v68 — áudios personalizados (.ogg)
 
 Substitua os arquivos abaixo em `public/assets/`, mantendo exatamente o mesmo nome e letras maiúsculas/minúsculas. Todos os `.ogg` novos neste pacote são **modelos silenciosos válidos**; seus sons reais ainda precisam ser copiados para essa pasta.

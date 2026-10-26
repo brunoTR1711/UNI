@@ -142,8 +142,16 @@ O painel do mestre inclui **Inspeção de documentos** para criar bilhetes/arqui
 
 ## Sons individuais de condições (v67)
 
-Cada um dos sete efeitos aplicáveis aos jogadores tem um `.ogg` próprio na pasta `public/assets/effects/`. Os modelos incluídos são **silenciosos e reproduzíveis**: substitua pelos seus arquivos reais com o mesmo nome. Consulte [Sons por efeito](docs/sons-por-efeito.md) para a tabela completa e orientações para atualizar no GitHub/Termux.
+Cada um dos sete efeitos aplicáveis aos jogadores tem um `.ogg` próprio na pasta `public/assets/audio/efeitos/modelos/`. Os modelos incluídos são **silenciosos e reproduzíveis**: substitua pelos seus arquivos reais com o mesmo nome. Consulte [Sons por efeito](docs/sons-por-efeito.md) para a tabela completa e orientações para atualizar no GitHub/Termux.
 
 ## Jumpscare sonoro global (v69)
 
-No painel do mestre (`/mestre`) selecione **Jumpscare → Aleatório, Som 1 ou Som 2** e clique em **DISPARAR JUMPSCARE**. Todos os jogadores conectados e canais de áudio da transmissão recebem o mesmo som. Para substituir os modelos silenciosos, use `public/assets/killer-JUMPSCARE1.ogg` e `killer-JUMPSCARE2.ogg`. O evento separado `jumpscare:event` reserva campo visual para efeitos posteriores; veja `docs/jumpscare-v69.md`.
+No painel do mestre (`/mestre`) selecione **Jumpscare → Aleatório, Som 1 ou Som 2** e clique em **DISPARAR JUMPSCARE**. Todos os jogadores conectados e canais de áudio da transmissão recebem o mesmo som. Para substituir os modelos silenciosos, use `public/assets/audio/jumpscare/killer-JUMPSCARE1.ogg` e `public/assets/audio/jumpscare/killer-JUMPSCARE2.ogg`. O evento separado `jumpscare:event` reserva campo visual para efeitos posteriores; veja `docs/jumpscare-v69.md`.
+
+## UNI v73 — Organização final e performance
+
+A central inicial foi simplificada e inclui o guia de acesso Tailscale em **Como entrar na sala?**. O overlay mostra nome e estilo sem os asteriscos/etiquetas antigos. Três novas cores exclusivas (vermelho, amarelo, turquesa) seguem todos os estados de vida.
+
+Os sons, artes de FX e ícones ficam separados em `public/assets/`. Para colocar ícones próprios, substitua os PNGs 1×1 de `public/assets/icons/` por PNGs reais sem mudar nomes. O SVG original segue visível enquanto não forem substituídos. Todos os arquivos estão mapeados em `docs/catalogo-icones-v73.csv`. Veja `docs/organizacao-assets-v73.md` para os caminhos atualizados, compatibilidade e instruções de atualização sem perder dados.
+
+As principais otimizações móveis removem o pré-carregamento/decodificação de todo o catálogo de sons e reduzem sombras/blurs pesados. Não alteram as animações de dados, documentos, estados ou eventos da stream.

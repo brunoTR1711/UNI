@@ -87,7 +87,7 @@ test("rotas existentes e revalidação de arquivos sem cache do estado", async (
     assert.equal(response.status, 200, route);
     assert.match(response.headers.get("content-type"), /text\/html/);
   }
-  for (const asset of ["/style.css", "/common.js", "/assets/stack-add.wav"]) {
+  for (const asset of ["/style.css", "/common.js", "/assets/audio/recursos/stack-add.ogg"]) {
     const first = await fetch(base + asset);
     assert.equal(first.headers.get("cache-control"), "no-cache");
     const etag = first.headers.get("etag");

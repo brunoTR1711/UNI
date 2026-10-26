@@ -62,7 +62,7 @@ test('todos os receptores reconhecem os 3 áudios OGG de estado', () => {
     for (const [name, source] of Object.entries({ master, player, overlay, stream })) {
       assert.ok(source.includes(`"${event}": ["${sound}"`), `${name}: ${event} não registrado`);
     }
-    assert.ok(sounds.includes(`${sound}: "/assets/${event}.ogg"`), `${event}: arquivo de áudio`);
+    assert.ok(sounds.includes(`${sound}: "/assets/audio/estados/${event}.ogg"`), `${event}: arquivo de áudio`);
   }
 });
 

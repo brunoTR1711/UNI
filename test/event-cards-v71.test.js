@@ -6,7 +6,7 @@ const cards = require('../public/event-card.js');
 const ROOT = path.resolve(__dirname, '..');
 for(const [key,filename] of Object.entries(cards.ICONS)) {
   test(`Ícone transparente encontrado: ${key}`, () => {
-    const p = path.join(ROOT, 'public/assets/event-cards', filename);
+    const p = path.join(ROOT, 'public/assets/fx/event-cards', filename);
     const data = fs.readFileSync(p);
     assert.equal(data.subarray(1,4).toString(), 'PNG');
     // PNG color type 6 == true-color with alpha

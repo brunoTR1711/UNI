@@ -21,7 +21,7 @@ for (const effect of effects) {
   test(`áudio individual de ${effect.nome} está configurado e é OGG real`, () => {
     assert.ok(effect.audio, "Condição sem tipo de áudio");
     const url = types[effect.audio];
-    assert.match(url, /^\/assets\/killer-[a-z-]+\.ogg$/);
+    assert.match(url, /^\/assets\/audio\/efeitos\/killer-[a-z-]+\.ogg$/);
     const file = path.join(root, "public", url);
     assert.ok(fs.existsSync(file), `${url} não existe`);
     const bytes = fs.readFileSync(file);

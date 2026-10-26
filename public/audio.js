@@ -1,45 +1,45 @@
 (function () {
   const sounds = {
     // Sons personalizados pelo usuário. Os arquivos OGG deste pacote são modelos silenciosos.
-    gained: "/assets/stack-add.ogg",
-    lost: "/assets/stack-remove.ogg",
-    stateFerido: "/assets/state-ferido.ogg",
-    stateMachucado: "/assets/state-machucado.ogg",
-    stateMorrendo: "/assets/state-morrendo.ogg",
-    stateMorto1: "/assets/state-morto1.ogg",
-    stateMorto2: "/assets/state-morto2.ogg",
-    rollDice: "/assets/dice-roll.wav", // Som original das rolagens (v67 e anteriores).
-    rollReveal1: "/assets/dice-reveal-1.ogg",
-    rollReveal2to19: "/assets/dice-reveal-2-19.ogg",
-    rollReveal20: "/assets/dice-reveal-20.ogg",
+    gained: "/assets/audio/recursos/stack-add.ogg",
+    lost: "/assets/audio/recursos/stack-remove.ogg",
+    stateFerido: "/assets/audio/estados/state-ferido.ogg",
+    stateMachucado: "/assets/audio/estados/state-machucado.ogg",
+    stateMorrendo: "/assets/audio/estados/state-morrendo.ogg",
+    stateMorto1: "/assets/audio/estados/state-morto1.ogg",
+    stateMorto2: "/assets/audio/estados/state-morto2.ogg",
+    rollDice: "/assets/audio/dados/dice-roll.wav", // Som original das rolagens (v67 e anteriores).
+    rollReveal1: "/assets/audio/dados/dice-reveal-1.ogg",
+    rollReveal2to19: "/assets/audio/dados/dice-reveal-2-19.ogg",
+    rollReveal20: "/assets/audio/dados/dice-reveal-20.ogg",
     // Compatibilidade com chamadas antigas de áudio que não identificam o resultado.
-    stateMorto: "/assets/state-morto1.ogg",
-    rollReveal: "/assets/dice-reveal-2-19.ogg",
-    killerJumpscare1: "/assets/killer-JUMPSCARE1.ogg",
-    killerJumpscare2: "/assets/killer-JUMPSCARE2.ogg",
+    stateMorto: "/assets/audio/estados/state-morto1.ogg",
+    rollReveal: "/assets/audio/dados/dice-reveal-2-19.ogg",
+    killerJumpscare1: "/assets/audio/jumpscare/killer-JUMPSCARE1.ogg",
+    killerJumpscare2: "/assets/audio/jumpscare/killer-JUMPSCARE2.ogg",
     // Outros sons cênicos existentes continuam intactos.
-    killerHitLight: "/assets/state-ferido.ogg",
-    killerHitHeavy: "/assets/state-machucado.ogg",
-    killerCritical: "/assets/state-morrendo.ogg",
-    killerChase: "/assets/killer-chase.wav",
-    killerChaseEnd: "/assets/killer-chase-end.wav",
-    killerApparition: "/assets/killer-apparition.wav",
-    killerBreak: "/assets/killer-break.wav",
-    killerDrag: "/assets/killer-drag.wav",
-    killerSpecial: "/assets/killer-special.wav",
-    killerTorment: "/assets/killer-torment.wav",
-    killerExecution: "/assets/killer-execution.wav",
-    killerPhase: "/assets/killer-phase.wav",
-    killerExposed: "/assets/killer-exposed.wav",
-    killerMark: "/assets/killer-mark.wav",
-    killerMiss: "/assets/killer-miss.wav",
-    effectFeridaProfunda: "/assets/killer-ferida-profunda.ogg",
-    effectQuebrado: "/assets/killer-quebrado.ogg",
-    effectIncapacitado: "/assets/killer-incapacitado.ogg",
-    effectExposto: "/assets/killer-exposto.ogg",
-    effectAlheio: "/assets/killer-alheio.ogg",
-    effectExaustao: "/assets/killer-exausto.ogg",
-    effectSorte: "/assets/killer-sorte.ogg"
+    killerHitLight: "/assets/audio/estados/state-ferido.ogg",
+    killerHitHeavy: "/assets/audio/estados/state-machucado.ogg",
+    killerCritical: "/assets/audio/estados/state-morrendo.ogg",
+    killerChase: "/assets/audio/cena/killer-chase.wav",
+    killerChaseEnd: "/assets/audio/cena/killer-chase-end.wav",
+    killerApparition: "/assets/audio/cena/killer-apparition.wav",
+    killerBreak: "/assets/audio/cena/killer-break.wav",
+    killerDrag: "/assets/audio/cena/killer-drag.wav",
+    killerSpecial: "/assets/audio/cena/killer-special.wav",
+    killerTorment: "/assets/audio/cena/killer-torment.ogg",
+    killerExecution: "/assets/audio/cena/killer-execution.wav",
+    killerPhase: "/assets/audio/cena/killer-phase.wav",
+    killerExposed: "/assets/audio/cena/killer-exposed.wav",
+    killerMark: "/assets/audio/cena/killer-mark.wav",
+    killerMiss: "/assets/audio/cena/killer-miss.wav",
+    effectFeridaProfunda: "/assets/audio/efeitos/killer-ferida-profunda.ogg",
+    effectQuebrado: "/assets/audio/efeitos/killer-quebrado.ogg",
+    effectIncapacitado: "/assets/audio/efeitos/killer-incapacitado.ogg",
+    effectExposto: "/assets/audio/efeitos/killer-exposto.ogg",
+    effectAlheio: "/assets/audio/efeitos/killer-alheio.ogg",
+    effectExaustao: "/assets/audio/efeitos/killer-exausto.ogg",
+    effectSorte: "/assets/audio/efeitos/killer-sorte.ogg"
   };
 
   const buffers = new Map();
@@ -107,7 +107,7 @@
     try {
       if (context.state === "suspended") await context.resume();
       startKeepAlive();
-      await preloadAll();
+      // Carregamento sob demanda: não decodificar dezenas de OGGs no gesto do usuário.
       unlocked = context.state === "running";
       document.dispatchEvent(new CustomEvent(unlocked ? "nevoa:audio-unlocked" : "nevoa:audio-blocked"));
       return unlocked;

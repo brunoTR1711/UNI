@@ -5,6 +5,9 @@ const grid = document.getElementById("players-grid");
 const { escapeHtml, getConditionPortrait, formatCondition } = Common;
 let renderedMarkup = "";
 
+function uniIcon(kind, key, fallback) {
+  return window.UNIAssetIcons?.render(kind, key, fallback) || fallback;
+}
 function svg(key) {
   return CAT?.svg?.[key] || CAT?.svg?.star || "";
 }
@@ -36,7 +39,7 @@ function renderCharacters(state) {
     return `
       <article class="player-select-card condition-${escapeHtml(character.estado)}">
         <a class="player-select-photo" href="/jogador/${encodeURIComponent(character.id)}">
-          ${portrait ? `<img src="${portrait}" loading="lazy" decoding="async" alt="Retrato de ${escapeHtml(character.nome)}">` : `<span>${svg(style?.icon || "user")}</span>`}
+          ${portrait ? `<img src="${portrait}" loading="lazy" decoding="async" alt="Retrato de ${escapeHtml(character.nome)}">` : `<span>${uniIcon("estilos", style?.key, svg(style?.icon || "user"))}</span>`}
           <em>${escapeHtml(stateLabel)}</em>
         </a>
         <div class="player-select-info">

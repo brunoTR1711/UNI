@@ -50,7 +50,7 @@
         '<div class="fx-blood"></div>',
         '<div class="fx-scratches"></div>',
         '<section class="fx-event-card" aria-live="polite">',
-          '<img class="fx-event-card__base" src="/assets/event-cards/event-card-basee.png" alt="">',
+          '<img class="fx-event-card__base" src="/assets/fx/event-cards/event-card-basee.png" alt="">',
           '<img class="fx-event-card__icon" alt="" hidden>',
           '<div class="fx-event-card__fallback" hidden><span>✦</span></div>',
           '<div class="fx-event-card__heading">',
@@ -218,7 +218,7 @@
     panel();
   }, { once:true });
 
-  window.NevoaAudio?.preloadAll?.();
+  // Áudios são decodificados sob demanda; evita travar Android na abertura. 
   setTimeout(panel, 500);
   layer();
 })();

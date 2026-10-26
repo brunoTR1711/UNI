@@ -1,0 +1,117 @@
+﻿Categoria;ID;Nome mostrado;Arquivo para substituir
+vantagens;vant-1;Frio na Espinha;public/assets/icons/vantagens/vant-1.png
+vantagens;vant-2;Autocura;public/assets/icons/vantagens/vant-2.png
+vantagens;vant-4;Líder;public/assets/icons/vantagens/vant-4.png
+vantagens;vant-5;Empatia;public/assets/icons/vantagens/vant-5.png
+vantagens;vant-6;Ninguém Fica pra Trás;public/assets/icons/vantagens/vant-6.png
+vantagens;vant-8;Tempo Emprestado;public/assets/icons/vantagens/vant-8.png
+vantagens;vant-9;Vínculo;public/assets/icons/vantagens/vant-9.png
+vantagens;vant-10;Arrancada Explosiva;public/assets/icons/vantagens/vant-10.png
+vantagens;vant-11;Resiliência;public/assets/icons/vantagens/vant-11.png
+vantagens;vant-12;Janelas de Oportunidade;public/assets/icons/vantagens/vant-12.png
+vantagens;vant-14;Distração;public/assets/icons/vantagens/vant-14.png
+vantagens;vant-19;Distorção;public/assets/icons/vantagens/vant-19.png
+vantagens;vant-20;Farmácia;public/assets/icons/vantagens/vant-20.png
+vantagens;vant-21;Duro na Queda;public/assets/icons/vantagens/vant-21.png
+vantagens;vant-22;Construído para Durar;public/assets/icons/vantagens/vant-22.png
+vantagens;vant-24;Prove-se;public/assets/icons/vantagens/vant-24.png
+vantagens;vant-25;Pelo Povo;public/assets/icons/vantagens/vant-25.png
+vantagens;vant-26;Força Interior;public/assets/icons/vantagens/vant-26.png
+vantagens;vant-31;Camaradagem;public/assets/icons/vantagens/vant-31.png
+vantagens;vant-32;Hiperfoco;public/assets/icons/vantagens/vant-32.png
+vantagens;vant-33;Acorde!;public/assets/icons/vantagens/vant-33.png
+vantagens;vant-36;Ressurgimento;public/assets/icons/vantagens/vant-36.png
+vantagens;vant-37;Solidariedade;public/assets/icons/vantagens/vant-37.png
+vantagens;vant-38;Espírito Calmo;public/assets/icons/vantagens/vant-38.png
+efeitos;ferida-profunda;Ferida Profunda;public/assets/icons/efeitos/ferida-profunda.png
+efeitos;quebrado;Quebrado;public/assets/icons/efeitos/quebrado.png
+efeitos;incapacitado;Incapacitado;public/assets/icons/efeitos/incapacitado.png
+efeitos;exposto;Exposto;public/assets/icons/efeitos/exposto.png
+efeitos;alheio;Alheio;public/assets/icons/efeitos/alheio.png
+efeitos;exaustao;Exaustão;public/assets/icons/efeitos/exaustao.png
+efeitos;sorte;Sorte;public/assets/icons/efeitos/sorte.png
+itens;cura-1;Cura — 1 carga;public/assets/icons/itens/cura-1.png
+itens;cura-2;Cura — 2 cargas;public/assets/icons/itens/cura-2.png
+itens;ferramenta-1;Ferramenta — 1 carga;public/assets/icons/itens/ferramenta-1.png
+itens;ferramenta-2;Ferramenta — 2 cargas;public/assets/icons/itens/ferramenta-2.png
+itens;defesa-1;Defesa — 1 carga;public/assets/icons/itens/defesa-1.png
+itens;defesa-2;Defesa — 2 cargas;public/assets/icons/itens/defesa-2.png
+itens;defesa-3;Defesa — 3 cargas;public/assets/icons/itens/defesa-3.png
+itens;distracao-1;Distração — 1 carga;public/assets/icons/itens/distracao-1.png
+estilos;escapista;ESCAPISTA;public/assets/icons/estilos/escapista.png
+estilos;protetor;PROTETOR;public/assets/icons/estilos/protetor.png
+estilos;rebelde;REBELDE;public/assets/icons/estilos/rebelde.png
+estilos;reservado;RESERVADO;public/assets/icons/estilos/reservado.png
+estilos;curioso;CURIOSO;public/assets/icons/estilos/curioso.png
+estilos;guia;GUIA;public/assets/icons/estilos/guia.png
+estilos;mistico;MÍSTICO;public/assets/icons/estilos/mistico.png
+estilos;resiliente;RESILIENTE;public/assets/icons/estilos/resiliente.png
+estilos;genio;GÊNIO;public/assets/icons/estilos/genio.png
+estilos;artista;ARTISTA;public/assets/icons/estilos/artista.png
+estilos;amigavel;AMIGÁVEL;public/assets/icons/estilos/amigavel.png
+vantagens;aranhas-tecelas;Aranhas Tecelãs;public/assets/icons/vantagens/aranhas-tecelas.png
+vantagens;corvos-traicoeiros;Corvos Traiçoeiros;public/assets/icons/vantagens/corvos-traicoeiros.png
+vantagens;teoria-das-trevas;Teoria das Trevas;public/assets/icons/vantagens/teoria-das-trevas.png
+vantagens;energia-potencial;Energia Potencial;public/assets/icons/vantagens/energia-potencial.png
+vantagens;sabedoria-da-nevoa;Sabedoria da Névoa;public/assets/icons/vantagens/sabedoria-da-nevoa.png
+vantagens;circulo-curativo;Círculo Curativo;public/assets/icons/vantagens/circulo-curativo.png
+vantagens;passos-sombrios;Passos Sombrios;public/assets/icons/vantagens/passos-sombrios.png
+vantagens;exponencial;Exponencial;public/assets/icons/vantagens/exponencial.png
+vantagens;guardiao-da-alma;Guardião da Alma;public/assets/icons/vantagens/guardiao-da-alma.png
+vantagens;pacto-de-sangue;Pacto de Sangue;public/assets/icons/vantagens/pacto-de-sangue.png
+atributos;cooperacao;Cooperacao;public/assets/icons/atributos/cooperacao.png
+atributos;folego;Folego;public/assets/icons/atributos/folego.png
+atributos;foco;Foco;public/assets/icons/atributos/foco.png
+habilidades-assassino;puxar;PUXAR;public/assets/icons/habilidades-assassino/puxar.png
+habilidades-assassino;separar;SEPARAR;public/assets/icons/habilidades-assassino/separar.png
+habilidades-assassino;possuir;POSSUIR;public/assets/icons/habilidades-assassino/possuir.png
+habilidades-assassino;quebrar;QUEBRAR;public/assets/icons/habilidades-assassino/quebrar.png
+habilidades-assassino;amplificar;AMPLIFICAR;public/assets/icons/habilidades-assassino/amplificar.png
+habilidades-assassino;arremessar;ARREMESSAR;public/assets/icons/habilidades-assassino/arremessar.png
+habilidades-assassino;retaliar;RETALIAR;public/assets/icons/habilidades-assassino/retaliar.png
+habilidades-assassino;rasgar;RASGAR;public/assets/icons/habilidades-assassino/rasgar.png
+habilidades-assassino;aviso;AVISO;public/assets/icons/habilidades-assassino/aviso.png
+habilidades-assassino;atormentar;ATORMENTAR;public/assets/icons/habilidades-assassino/atormentar.png
+habilidades-assassino;horda;HORDA;public/assets/icons/habilidades-assassino/horda.png
+habilidades-assassino;infectar;INFECTAR;public/assets/icons/habilidades-assassino/infectar.png
+habilidades-assassino;febre;FEBRE;public/assets/icons/habilidades-assassino/febre.png
+habilidades-assassino;acidente;ACIDENTE;public/assets/icons/habilidades-assassino/acidente.png
+habilidades-assassino;karma;KARMA;public/assets/icons/habilidades-assassino/karma.png
+habilidades-assassino;premonicao;PREMONIÇÃO;public/assets/icons/habilidades-assassino/premonicao.png
+habilidades-assassino;sabotagem;SABOTAGEM;public/assets/icons/habilidades-assassino/sabotagem.png
+habilidades-assassino;alibi;ALIBI;public/assets/icons/habilidades-assassino/alibi.png
+habilidades-assassino;revelacao;REVELAÇÃO;public/assets/icons/habilidades-assassino/revelacao.png
+vantagens-assassino;vantagem-1;Enganei Você!;public/assets/icons/vantagens-assassino/vantagem-1.png
+vantagens-assassino;vantagem-2;Morte de Franklin;public/assets/icons/vantagens-assassino/vantagem-2.png
+vantagens-assassino;vantagem-3;Ninguém Escapa da Morte;public/assets/icons/vantagens-assassino/vantagem-3.png
+vantagens-assassino;vantagem-4;Açougueiro Desleixado;public/assets/icons/vantagens-assassino/vantagem-4.png
+vantagens-assassino;vantagem-5;Insidioso;public/assets/icons/vantagens-assassino/vantagem-5.png
+vantagens-assassino;vantagem-6;Implacável;public/assets/icons/vantagens-assassino/vantagem-6.png
+vantagens-assassino;vantagem-7;Lembre-se de Mim;public/assets/icons/vantagens-assassino/vantagem-7.png
+vantagens-assassino;vantagem-8;Terceiro Selo;public/assets/icons/vantagens-assassino/vantagem-8.png
+vantagens-assassino;vantagem-9;Nascido da Luz;public/assets/icons/vantagens-assassino/vantagem-9.png
+vantagens-assassino;vantagem-10;Perdendo a Esperança;public/assets/icons/vantagens-assassino/vantagem-10.png
+vantagens-assassino;vantagem-11;Brinque com a Sua Comida;public/assets/icons/vantagens-assassino/vantagem-11.png
+vantagens-assassino;vantagem-12;Presença Desconcertante;public/assets/icons/vantagens-assassino/vantagem-12.png
+vantagens-assassino;vantagem-13;Resistência;public/assets/icons/vantagens-assassino/vantagem-13.png
+vantagens-assassino;vantagem-14;Soberba;public/assets/icons/vantagens-assassino/vantagem-14.png
+vantagens-assassino;vantagem-15;Tanatofobia;public/assets/icons/vantagens-assassino/vantagem-15.png
+vantagens-assassino;vantagem-16;Nêmesis;public/assets/icons/vantagens-assassino/vantagem-16.png
+vantagens-assassino;vantagem-17;Faça Sua Escolha;public/assets/icons/vantagens-assassino/vantagem-17.png
+vantagens-assassino;vantagem-18;Dama de Ferro;public/assets/icons/vantagens-assassino/vantagem-18.png
+vantagens-assassino;vantagem-19;Churrasco com Chilli;public/assets/icons/vantagens-assassino/vantagem-19.png
+vantagens-assassino;vantagem-20;Força Brutal;public/assets/icons/vantagens-assassino/vantagem-20.png
+vantagens-assassino;vantagem-21;Rancor;public/assets/icons/vantagens-assassino/vantagem-21.png
+vantagens-assassino;vantagem-22;Pavor Contagiante;public/assets/icons/vantagens-assassino/vantagem-22.png
+vantagens-assassino;vantagem-23;Eco Sanguíneo;public/assets/icons/vantagens-assassino/vantagem-23.png
+vantagens-assassino;vantagem-24;Estridor;public/assets/icons/vantagens-assassino/vantagem-24.png
+vantagens-assassino;vantagem-25;Discordância;public/assets/icons/vantagens-assassino/vantagem-25.png
+vantagens-assassino;vantagem-26;Não Há Onde se Esconder;public/assets/icons/vantagens-assassino/vantagem-26.png
+vantagens-assassino;vantagem-27;Canção de Ninar;public/assets/icons/vantagens-assassino/vantagem-27.png
+vantagens-assassino;vantagem-28;Baterias Inclusas;public/assets/icons/vantagens-assassino/vantagem-28.png
+vantagens-assassino;vantagem-29;Punição Forçada;public/assets/icons/vantagens-assassino/vantagem-29.png
+vantagens-assassino;vantagem-30;Fúria Espiritual;public/assets/icons/vantagens-assassino/vantagem-30.png
+vantagens-assassino;vantagem-31;Táticas Zanshin;public/assets/icons/vantagens-assassino/vantagem-31.png
+vantagens-assassino;vantagem-32;Opressão;public/assets/icons/vantagens-assassino/vantagem-32.png
+vantagens-assassino;vantagem-33;Sem Saída;public/assets/icons/vantagens-assassino/vantagem-33.png
+vantagens-assassino;vantagem-34;Deslumbre;public/assets/icons/vantagens-assassino/vantagem-34.png

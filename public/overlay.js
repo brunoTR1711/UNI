@@ -82,6 +82,9 @@ const OVERLAY_AUDIO_MAP = {
   effectExaustao: ["effectExaustao", 0.78],
   effectSorte: ["effectSorte", 0.78]
 };
+function uniIcon(kind, key, fallback) {
+  return window.UNIAssetIcons?.render(kind, key, fallback) || fallback;
+}
 function svg(key) { return CAT.svg[key] || CAT.svg.star || ""; }
 function eventMatchesThisOverlay(event) { if (!event) return false; if (!singleId) return true; return !event.characterId || event.characterId === singleId; }
 function ensureOverlayAudioPanel() {
@@ -138,7 +141,6 @@ socket.on("audio:event", (event) => {
   playOverlayAudioEvent(event);
 });
 window.addEventListener("pointerdown", () => { if (overlayAudioEnabled && !window.NevoaAudio?.isUnlocked?.()) unlockOverlayAudio(false); }, { once: true });
-window.NevoaAudio?.preloadAll?.();
 unlockOverlayAudio(false);
 setInterval(ensureOverlayAudioPanel, 1400);
 
@@ -222,12 +224,12 @@ function render(characters) {
             <div class="vhs-chroma vhs-chroma-red"></div>
             <div class="vhs-chroma vhs-chroma-blue"></div>
             <div class="vhs-osd vhs-osd-top"><span>REC</span><span>CAM ${escapeHtml(character.id).slice(0, 2).toUpperCase() || '01'}</span><span>SP</span></div>
-            <div class="vhs-character-name">*${escapeHtml(character.nome || 'NOME PERSONAGEM')}*</div>
+            <div class="vhs-character-name">${escapeHtml(character.nome || 'NOME PERSONAGEM')}</div>
             <div class="vhs-portrait">${portrait ? `<img src="${portrait}" alt="${escapeHtml(character.nome)}" />` : `<span>NO IMAGE</span>`}</div>
             ${renderOverlayEffects(character)}
             ${renderOverlayItems(character)}
             <div class="overlay-roll-slot vhs-roll-slot">${makeLatestRoll(character)}</div>
-            <div class="vhs-style-tag"><strong>ESTILO</strong><span>*${escapeHtml(character.estilo || 'NOME E.')}*</span></div>
+            <div class="vhs-style-tag"><span>${escapeHtml(character.estilo || 'NOME E.')}</span></div>
             <div class="vhs-dead-screen"><strong>NO SIGNAL</strong><small>TAPE END / CHARACTER LOST</small></div>
           </section>
 
@@ -291,7 +293,7 @@ function renderOverlayItems(character) {
     const animation = Number.isInteger(previous) && previous !== item.charges ? (item.charges > previous ? 'count-gained' : 'count-lost') : '';
     const count = item.max > 0 ? String(item.charges) : '—';
     return `<article class="overlay-item-icon-chip" title="${escapeHtml(item.nome)}${item.max > 0 ? `: ${item.charges} carga(s)` : ''}">
-      <span class="catalog-icon small">${svg(item.icon)}</span>
+      <span class="catalog-icon small">${uniIcon("itens", item.key, svg(item.icon))}</span>
       <strong class="overlay-item-count ${animation}">${count}</strong>
     </article>`;
   }).join('')}</section></div>`;
@@ -314,15 +316,15 @@ function renderOverlayEffects(character) {
   if (!effects.length && !ghosts.length) return '';
   return `<section class="overlay-effects-vertical" aria-label="Efeitos ativos">
     ${effects.map((effect) => `<span class="overlay-effect-icon ${effect.negative === false ? 'positive' : 'negative'} ${addedKeys.has(effect.key) ? 'effect-enter' : ''}" title="${escapeHtml(effect.nome)}">
-      <span class="catalog-icon tiny">${svg(effect.icon)}</span>
+      <span class="catalog-icon tiny">${uniIcon("efeitos", effect.key, svg(effect.icon))}</span>
     </span>`).join('')}
     ${ghosts.slice(0, Math.max(0, 8 - effects.length)).map(({ effect }) => `<span class="overlay-effect-icon effect-leave" title="${escapeHtml(effect.nome)} removido">
-      <span class="catalog-icon tiny">${svg(effect.icon)}</span>
+      <span class="catalog-icon tiny">${uniIcon("efeitos", effect.key, svg(effect.icon))}</span>
     </span>`).join('')}
   </section>`;
 }
 function d20RollSvg() {
-  return `<img class="vhs-d20-bg" src="/assets/result-display-d20.png" alt="" aria-hidden="true">`;
+  return `<img class="vhs-d20-bg" src="/assets/ui/result-display-d20.png" alt="" aria-hidden="true">`;
 }
 function makeLatestRoll(character) {
   const activeRolls = ["cooperacao", "folego", "foco"].map((resource) => {

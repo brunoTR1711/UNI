@@ -120,7 +120,7 @@ socket.on("audio:event", (event) => {
   playEvent(event.type);
 });
 
-window.NevoaAudio?.preloadAll?.().then(updateDiagnostic);
+updateDiagnostic(); // pré-carregamento total desativado; reduz CPU e RAM no tablet
 if (enabled) window.NevoaAudio?.unlock?.().then(updateDiagnostic);
 setInterval(updateDiagnostic, 1500);
 updateDiagnostic();

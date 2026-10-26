@@ -1,0 +1,10 @@
+ÍCONES PERSONALIZÁVEIS — UNI v73
+
+Cada PNG transparente 1x1 desta pasta é um MARCADOR VAZIO válido.
+O SVG original permanece visível enquanto o arquivo for 1x1.
+Para personalizar, substitua o PNG de mesmo nome por uma imagem real 128x128 ou 256x256 com transparência.
+NÃO renomeie os arquivos. Não altere os IDs no JavaScript.
+Após atualizar GitHub/Termux, use Ctrl+F5 ou atualize cache no OBS.
+O navegador detecta automaticamente que o arquivo deixou de ser 1x1, sem precisar alterar código.
+
+Pastas: vantagens, efeitos, itens, atributos, estilos, vantagens-assassino, habilidades-assassino.

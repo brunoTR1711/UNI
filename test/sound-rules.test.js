@@ -55,7 +55,7 @@ test('todos os arquivos de substituição têm OGG real válido', () => {
     'dice-reveal-1','dice-reveal-2-19','dice-reveal-20'
   ];
   for (const name of names) {
-    const bytes = fs.readFileSync(path.join(root, 'public/assets', `${name}.ogg`));
+    const bytes = fs.readFileSync(path.join(root, 'public', sounds[Object.keys(sounds).find(key => sounds[key]?.endsWith('/' + name + '.ogg'))] || `/assets/audio/efeitos/${name}.ogg`));
     assert.ok(bytes.length > 100, name);
     assert.equal(bytes.toString('ascii', 0, 4), 'OggS', name);
   }
@@ -70,8 +70,8 @@ test('a revelação não é mais disparada por temporizador genérico', () => {
 // A rolagem utiliza o WAV original; o OGG antigo não é mais necessário.
 test('o som inicial da rolagem utiliza o WAV original', () => {
   const source = read('public/audio.js');
-  assert.match(source, /rollDice: \"\/assets\/dice-roll\.wav\"/);
-  const wav = fs.readFileSync(path.join(root, 'public/assets/dice-roll.wav'));
+  assert.match(source, /rollDice: \"\/assets\/audio\/dados\/dice-roll\.wav\"/);
+  const wav = fs.readFileSync(path.join(root, 'public/assets/audio/dados/dice-roll.wav'));
   assert.ok(wav.length > 100);
   assert.equal(wav.toString('ascii', 0, 4), 'RIFF');
 });

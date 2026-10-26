@@ -7,54 +7,38 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <title>Uma Noite no Inferno — Central</title>
-  <link rel="stylesheet" href="/style.css?v=63" />
+  <link rel="stylesheet" href="/style.css?v=73" />
 </head>
 <body class="landing-page">
   <main class="landing-shell">
     <section class="landing-card">
       <p class="eyebrow">UMA NOITE NO INFERNO</p>
       <h1><a class="title-link" href="https://online.anyflip.com/obrff/nsjc/mobile/index.html" target="_blank" rel="noopener">ALÉM DA <span>NÉVOA</span></a></h1>
-      <p class="landing-copy">
-        Versão simplificada para a one-shot Uma Noite no Inferno: sobreviventes, recursos, condições, itens e efeitos cênicos essenciais para OBS.
-      </p>
-
+      <p class="landing-copy">Acesse sua ficha ou controle a mesa. Uma única sala, sincronizada em tempo real.</p>
       <div class="landing-actions">
-        <a class="primary-button" href="/mestre">ABRIR PAINEL DO MESTRE</a>
-        <a class="secondary-button" href="/jogadores">ABRIR PAINEL DE JOGADOR</a>
-        <a class="secondary-button" href="/overlay">ABRIR OVERLAY</a>
+        <a class="primary-button" href="/jogadores">ENTRAR COMO JOGADOR</a>
+        <a class="secondary-button" href="/mestre">PAINEL DO MESTRE</a>
+        <a class="secondary-button" href="/overlay">OVERLAY / OBS</a>
       </div>
-
-      <section class="network-panel">
-        <h2>ENDEREÇOS DA REDE</h2>
-        <div id="network-list">Carregando...</div>
-      </section>
-
-      <p class="landing-note">
-        Crie os personagens no painel do mestre. Cada personagem terá um link para o jogador e outro link individual para adicionar como fonte Navegador no OBS.
-      </p>
+      <details class="uni-join-help">
+        <summary>Como entrar na sala?</summary>
+        <div class="uni-join-help-content">
+          <p>Para jogadores fora da rede Wi-Fi do mestre, use o <strong>Tailscale</strong>:</p>
+          <ol>
+            <li>Instale o Tailscale em <a href="https://tailscale.com/download" target="_blank" rel="noopener noreferrer">tailscale.com/download</a>.</li>
+            <li>Entre no aplicativo com sua conta (por exemplo, Google).</li>
+            <li>Abra o <strong>link de convite enviado pelo mestre</strong> e entre com a mesma conta.</li>
+            <li>Clique em <strong>Accept invite / Aceitar convite</strong> e volte ao aplicativo.</li>
+            <li>Ative <strong>Connect / Conectar</strong> (aceite a permissão de VPN no celular).</li>
+            <li>Abra o <strong>endereço 100.x.x.x:3000/jogadores</strong> informado pelo mestre, selecione seu personagem e abra a ficha.</li>
+          </ol>
+          <p>Mantenha o Tailscale conectado enquanto joga. Não é preciso instalar o RPG.</p>
+          <p>Se estiver no mesmo Wi-Fi do servidor, basta usar o endereço local fornecido pelo mestre, sem Tailscale.</p>
+        </div>
+      </details>
     </section>
   </main>
 
-  <script>
-    fetch("/api/network")
-      .then((response) => response.json())
-      .then(({ ips, port }) => {
-        const list = document.getElementById("network-list");
-        const urls = [
-          `http://localhost:${port}`,
-          `http://localhost:${port}/mestre`,
-          `http://localhost:${port}/jogadores`,
-          `http://localhost:${port}/overlay`,
-          ...ips.flatMap((ip) => [`http://${ip}:${port}`, `http://${ip}:${port}/jogadores`, `http://${ip}:${port}/overlay`])
-        ];
-        list.innerHTML = urls
-          .map((url) => `<code>${url}</code>`)
-          .join("");
-      })
-      .catch(() => {
-        document.getElementById("network-list").textContent =
-          "Não foi possível detectar os endereços automaticamente.";
-      });
-  </script>
+
 </body>
 </html>

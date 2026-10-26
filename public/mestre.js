@@ -90,6 +90,9 @@ function primeRollsFromState(incomingState) {
   });
 }
 
+function uniIcon(kind, key, fallback) {
+  return window.UNIAssetIcons?.render(kind, key, fallback) || fallback;
+}
 function svg(key) {
   return CAT.svg[key] || ACAT.svg?.[key] || CAT.svg.star || "";
 }
@@ -253,7 +256,7 @@ function renderKillerPlaceholders() {
 
   killerAdvantagesSlot.innerHTML = selectedAdvantages.map((advantage, index) => `
     <button type="button" class="vhs-killer-exclusive-row ${advantage ? "filled" : "empty"}" data-picker="advantage" data-slot="${index}">
-      <span class="vhs-killer-exclusive-icon">${killerSvg(advantage?.icon || "skull")}</span>
+      <span class="vhs-killer-exclusive-icon">${advantage ? uniIcon("vantagens-assassino", advantage.key, killerSvg(advantage.icon || "skull")) : killerSvg("skull")}</span>
       <div class="vhs-killer-exclusive-copy">
         <small>VANTAGEM ${index + 1}</small>
         <strong>${escapeHtml(advantage?.nome || "ADICIONAR VANTAGEM")}</strong>
@@ -264,7 +267,7 @@ function renderKillerPlaceholders() {
 
   killerAbilitiesSlot.innerHTML = selectedAbilities.map((ability, index) => `
     <button type="button" class="vhs-killer-exclusive-row ${ability ? "filled" : "empty"}" data-picker="ability" data-slot="${index}">
-      <span class="vhs-killer-exclusive-icon">${killerSvg(ability?.icon || "skull")}</span>
+      <span class="vhs-killer-exclusive-icon">${ability ? uniIcon("habilidades-assassino", ability.key, killerSvg(ability.icon || "skull")) : killerSvg("skull")}</span>
       <div class="vhs-killer-exclusive-copy">
         <small>HABILIDADE ${index + 1}</small>
         <strong>${escapeHtml(ability?.nome || "ADICIONAR HABILIDADE")}</strong>
@@ -301,7 +304,7 @@ function renderConditionGlyphs(character) {
   const effects = Array.isArray(character.effects) ? character.effects.slice(0, 6) : [];
   if (!effects.length) return `<span class="lite-empty inline">—</span>`;
   return effects.map((effect) => `
-    <button type="button" class="master-cond-icon ${effect.negative === false ? "positive" : ""}" title="${escapeHtml(effect.nome)}" data-action="remove-effect" data-id="${escapeHtml(character.id)}" data-effect="${escapeHtml(effect.key)}">${svg(effect.icon)}</button>
+    <button type="button" class="master-cond-icon ${effect.negative === false ? "positive" : ""}" title="${escapeHtml(effect.nome)}" data-action="remove-effect" data-id="${escapeHtml(character.id)}" data-effect="${escapeHtml(effect.key)}">${uniIcon("efeitos", effect.key, svg(effect.icon))}</button>
   `).join("");
 }
 function renderCharacterMini(character) {
@@ -364,7 +367,7 @@ function renderKillerPickerList(filterText = "") {
   const filtered = source.filter((entry) => !query || entry.nome.toLowerCase().includes(query) || (entry.descricao || "").toLowerCase().includes(query));
   killerPickerList.innerHTML = filtered.map((entry) => {
     const already = selected.some((picked, idx) => idx !== killerPickerSlot && picked?.key === entry.key);
-    return `<button type="button" class="assassin-picker-item ${already ? "is-disabled" : ""}" data-pick-key="${escapeHtml(entry.key)}" ${already ? "disabled" : ""}><span>${killerSvg(entry.icon || "skull")}</span><div><h3>${escapeHtml(entry.nome)}</h3><small>${already ? "JÁ ESCOLHIDA EM OUTRO SLOT" : (entry.key === currentKey ? "SELECIONADA NESTE SLOT" : "DISPONÍVEL")}</small><p>${escapeHtml(entry.descricao || entry.description || "")}</p></div></button>`;
+    return `<button type="button" class="assassin-picker-item ${already ? "is-disabled" : ""}" data-pick-key="${escapeHtml(entry.key)}" ${already ? "disabled" : ""}><span>${uniIcon(killerPickerMode === "ability" ? "habilidades-assassino" : "vantagens-assassino", entry.key, killerSvg(entry.icon || "skull"))}</span><div><h3>${escapeHtml(entry.nome)}</h3><small>${already ? "JÁ ESCOLHIDA EM OUTRO SLOT" : (entry.key === currentKey ? "SELECIONADA NESTE SLOT" : "DISPONÍVEL")}</small><p>${escapeHtml(entry.descricao || entry.description || "")}</p></div></button>`;
   }).join("") || `<p class="vhs-empty-copy">Nenhum resultado.</p>`;
   killerPickerList.querySelectorAll("[data-pick-key]").forEach((button) => {
     button.addEventListener("click", () => {

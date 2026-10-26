@@ -1,0 +1,1 @@
+Esta pasta e criada automaticamente pelo servidor. Ao atualizar uma instalacao existente, NAO sobrescreva data/state.json.

@@ -10,7 +10,7 @@ test('som de rolagem D20 usa o WAV original audível, não o OGG silencioso', ()
   const ctx = vm.createContext({window:{}});
   vm.runInContext(read('public/audio.js'), ctx);
   const mapped = ctx.window.NevoaAudio.sounds.rollDice;
-  assert.equal(mapped, '/assets/dice-roll.wav');
+  assert.equal(mapped, '/assets/audio/dados/dice-roll.wav');
   const asset = fs.readFileSync(path.join(root, 'public', mapped));
   assert.ok(asset.length > 160000);
   assert.equal(asset.toString('ascii', 0, 4), 'RIFF');
@@ -29,6 +29,6 @@ test('início da rolagem segue atendendo mestre, jogador, overlay e áudio OBS',
 
 test('todos os canais carregam uma versão atualizada do áudio', () => {
   for (const page of ['jogador.html', 'mestre.html', 'overlay.html', 'audio.html', 'effects.html', 'assassino-overlay.html']) {
-    assert.match(read(`public/${page}`), /\/audio\.js\?v=70/);
+    assert.match(read(`public/${page}`), /\/audio\.js\?v=73/);
   }
 });

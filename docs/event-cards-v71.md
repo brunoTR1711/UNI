@@ -1,3 +1,5 @@
+> **Atenção (v73):** os caminhos abaixo são históricos. Consulte [`organizacao-assets-v73.md`](organizacao-assets-v73.md) para os caminhos atuais.
+
 # V71 — Event Cards na camada FX
 
 Os oito PNGs originais enviados pelo mestre estão em `public/assets/event-cards/`: uma base e sete ícones de condições. Mantenha o nome do arquivo e a transparência PNG.

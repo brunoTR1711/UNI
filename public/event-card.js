@@ -5,7 +5,7 @@
   if (root) root.NevoaEventCards = api;
 })(typeof window !== 'undefined' ? window : null, function() {
   'use strict';
-  const BASE = '/assets/event-cards/';
+  const BASE = '/assets/fx/event-cards/';
   const ICONS = Object.freeze({
     'ferida-profunda': 'icon-card-ferida-profunda.png',
     'quebrado': 'icon-card-quebrado.png',

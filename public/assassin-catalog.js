@@ -89,7 +89,7 @@
     { key:'ferida-profunda', nome:'FERIDA PROFUNDA', icon:'drop', description:'Perde 1 Fôlego por rodada até ser curado. Encerra ao chegar a 0 Fôlego.', scene:'attackHit', intensity:'heavy', audio:'killerHitHeavy' },
     { key:'quebrado', nome:'QUEBRADO', icon:'broken', description:'Não recupera Estados de Saúde.', scene:'obstacleBreak', intensity:'heavy', audio:'killerBreak' },
     { key:'incapacitado', nome:'INCAPACITADO', icon:'hands', description:'Não pode atordoar nem cegar.', scene:'special', intensity:'medium', audio:'killerSpecial' },
-    { key:'exposto', nome:'EXPOSTO', icon:'skull', description:'Próximo golpe leva a Em Risco; se já estiver Em Risco, morre.', scene:'exposed', intensity:'medium', audio:'killerExposed' },
+    { key:'exposto', nome:'EXPOSTO', icon:'skull', description:'Próximo golpe leva a Morrendo; se já estiver Em Morrendo, declare a morte.', scene:'exposed', intensity:'medium', audio:'killerExposed' },
     { key:'alheio', nome:'ALHEIO', icon:'face', description:'Não pode ficar de tocaia nem resistir.', scene:'torment', intensity:'medium', audio:'killerTorment' },
     { key:'exaustao', nome:'EXAUSTÃO', icon:'exhausted', description:'Não pode usar ações que causem exaustão.', scene:'torment', intensity:'medium', audio:'killerTorment' },
     { key:'sorte', nome:'SORTE', icon:'clover', description:'Recebe 1 rerrolagem extra.', scene:'special', intensity:'light', audio:'killerSpecial' }

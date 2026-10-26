@@ -1,3 +1,5 @@
+> **Atenção (v73):** os caminhos abaixo são históricos. Consulte [`organizacao-assets-v73.md`](organizacao-assets-v73.md) para os caminhos atuais.
+
 # v70 — Som original do D20 restaurado
 
 A v68 introduziu `public/assets/dice-roll.ogg` como **modelo silencioso**. O mapeamento em `public/audio.js` passou a usá-lo, e por isso a rolagem ficou sem som.

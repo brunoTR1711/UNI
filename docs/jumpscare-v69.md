@@ -1,3 +1,5 @@
+> **Atenção (v73):** os caminhos abaixo são históricos. Consulte [`organizacao-assets-v73.md`](organizacao-assets-v73.md) para os caminhos atuais.
+
 # Jumpscare global — v69
 
 No painel `/mestre`, no bloco **Jumpscare**, selecione **Aleatório**, **Jumpscare 1** ou **Jumpscare 2** e clique **DISPARAR JUMPSCARE**.

@@ -25,7 +25,7 @@ test("evento preparado para visual futuro; audio global tem referências", () =>
   assert.match(server, /io.emit\("jumpscare:event"/);
   for (const source of [player,fx,overlay,obsAudio]) assert.match(source,/killerJumpscare1/);
   for (const variant of [1,2]) {
-    const file = path.join(root, `public/assets/killer-JUMPSCARE${variant}.ogg`);
+    const file = path.join(root, `public/assets/audio/jumpscare/killer-JUMPSCARE${variant}.ogg`);
     assert.ok(fs.existsSync(file));
     assert.equal(fs.readFileSync(file).toString("ascii",0,4), "OggS");
   }

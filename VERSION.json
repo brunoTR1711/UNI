@@ -1,0 +1,6 @@
+{
+  "version": "v73",
+  "build": "UNI-v73-final-pc-mobile",
+  "release": "2026-10-26",
+  "assets": "modulares, com fallback SVG"
+}

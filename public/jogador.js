@@ -129,6 +129,9 @@ function primeRollsFromState(incomingState) {
   });
 }
 
+function uniIcon(kind, key, fallback) {
+  return window.UNIAssetIcons?.render(kind, key, fallback) || fallback;
+}
 function svg(key) {
   return CAT.svg[key] || CAT.svg.star || "";
 }
@@ -200,7 +203,7 @@ function renderAdvantagesSummary() {
             </button>`;
           }
           return `<button type="button" class="vhs-adv-row" data-action="select-advantage" data-slot="${slot}">
-            <span class="vhs-cell-icon">${svg(advantage.icon)}</span>
+            <span class="vhs-cell-icon">${uniIcon("vantagens", advantage.key, svg(advantage.icon))}</span>
             <div>
               <strong>${escapeHtml(advantage.nome)}</strong>
               <p>${escapeHtml(advantage.descricao || '')}</p>
@@ -219,7 +222,7 @@ function renderEffectsBoard() {
       <div class="vhs-effect-list ${effects.length ? '' : 'empty'}">
         ${effects.length ? effects.map((effect) => `
           <article class="vhs-effect-row ${effect.negative === false ? 'positive' : 'negative'}">
-            <span class="vhs-cell-icon">${svg(effect.icon)}</span>
+            <span class="vhs-cell-icon">${uniIcon("efeitos", effect.key, svg(effect.icon))}</span>
             <div>
               <strong>${escapeHtml(effect.nome)}</strong>
               <p>${escapeHtml(effect.descricao || '')}</p>
@@ -266,7 +269,7 @@ function renderItemsCompact() {
           }
           return `<article class="vhs-item-card">
             <button type="button" class="vhs-item-head" data-action="open-item" data-slot="${slot}">
-              <span class="vhs-cell-icon">${svg(item.icon)}</span>
+              <span class="vhs-cell-icon">${uniIcon("itens", item.key, svg(item.icon))}</span>
               <div><small>${escapeHtml(item.categoria ? item.categoria.toUpperCase() : `ITEM ${slot + 1}`)}</small><strong>${escapeHtml(item.nome)}</strong></div>
             </button>
             <p>${escapeHtml(item.descricao || '')}</p>
@@ -281,13 +284,13 @@ function renderItemsCompact() {
 function renderLatestRollPanel() {
   const latest = getLatestRollData();
   if (!latest) {
-    return `<section class="vhs-card vhs-roll-panel empty"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display idle"><img src="/assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON.foco}</span><strong>—</strong><em></em></div></div></section>`;
+    return `<section class="vhs-card vhs-roll-panel empty"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display idle"><img src="/assets/ui/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON.foco}</span><strong>—</strong><em></em></div></div></section>`;
   }
   const roll = latest.roll;
   const rollKey = makeClientRollKey(id, latest.resource, roll);
   const isRolling = isClientRollRolling(rollKey);
   const visibleValue = getDiceDisplayValue(rollKey, roll.value);
-  return `<section class="vhs-card vhs-roll-panel"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display ${isRolling ? 'rolling' : ''}"><img src="/assets/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON[latest.resource]}</span><strong class="dice-result" data-client-roll-key="${escapeHtml(rollKey)}" data-roll-at="${roll.at}" data-reveal-at="${roll.revealAt || roll.at}" data-final-value="${roll.value}">${visibleValue}</strong><em>${isRolling ? 'ROLANDO' : ''}</em></div></div></section>`;
+  return `<section class="vhs-card vhs-roll-panel"><header class="vhs-panel-head"><h3>Rolagem</h3><small>1d20</small></header><div class="sheet-d20-display ${isRolling ? 'rolling' : ''}"><img src="/assets/ui/result-display-d20.png" alt=""><div class="sheet-d20-content"><span class="sheet-d20-icon">${RESOURCE_ICON[latest.resource]}</span><strong class="dice-result" data-client-roll-key="${escapeHtml(rollKey)}" data-roll-at="${roll.at}" data-reveal-at="${roll.revealAt || roll.at}" data-final-value="${roll.value}">${visibleValue}</strong><em>${isRolling ? 'ROLANDO' : ''}</em></div></div></section>`;
 }
 function renderAttributeStatePanel() {
   return `
@@ -517,7 +520,7 @@ function renderStyleModal() {
     const isCurrent = character?.styleKey === style.key;
     const unavailable = Boolean(owner && !isCurrent);
     return `<button class="picker-item style-picker-item ${unavailable ? "unavailable" : ""} ${isCurrent ? "selected" : ""}" data-style-key="${escapeHtml(style.key)}" type="button" ${unavailable ? "disabled" : ""}>
-      <span class="catalog-icon">${svg(style.icon)}</span>
+      <span class="catalog-icon">${uniIcon("estilos", style.key, svg(style.icon))}</span>
       <div>
         <strong>${escapeHtml(style.nome)}</strong>
         <span>${escapeHtml(style.descricao)}</span>
@@ -546,7 +549,7 @@ function renderItemModal(term) {
   const items = CAT.items.filter((item) => `${item.nome} ${item.categoria || ''} ${item.descricao}`.toLowerCase().includes(normalized));
   itemList.innerHTML = `
     <button class="picker-item remove-advantage" data-remove="true" type="button"><strong>REMOVER ITEM</strong><span>Deixa este slot vazio.</span></button>
-    ${items.map((item, index) => `<button class="picker-item style-picker-item" data-index="${index}" type="button"><span class="catalog-icon">${svg(item.icon)}</span><div><strong>${escapeHtml(item.nome)}</strong><span>${escapeHtml(item.descricao)}</span><small>${item.max > 0 ? `${item.max} carga${item.max === 1 ? "" : "s"}` : "Sem cargas"}</small></div></button>`).join("")}
+    ${items.map((item, index) => `<button class="picker-item style-picker-item" data-index="${index}" type="button"><span class="catalog-icon">${uniIcon("itens", item.key, svg(item.icon))}</span><div><strong>${escapeHtml(item.nome)}</strong><span>${escapeHtml(item.descricao)}</span><small>${item.max > 0 ? `${item.max} carga${item.max === 1 ? "" : "s"}` : "Sem cargas"}</small></div></button>`).join("")}
   `;
   itemList.querySelectorAll(".picker-item").forEach((button) => button.addEventListener("click", () => {
     socket.emit("character:setItem", { id, slotIndex: currentItemSlot, item: button.dataset.remove === "true" ? null : items[Number(button.dataset.index)] });
@@ -582,7 +585,7 @@ function renderAdvantageModal(term) {
     ${advantages.map((advantage, index) => {
       const owner = usedOwners.get(advantage.key);
       const unavailable = Boolean(owner && !isCurrentSlotAdvantage(advantage));
-      return `<button class="picker-item style-picker-item ${unavailable ? "unavailable" : ""}" data-index="${index}" type="button" ${unavailable ? "disabled" : ""}><span class="catalog-icon">${svg(advantage.icon)}</span><div><strong>${escapeHtml(advantage.nome)}</strong><span>${escapeHtml(advantage.descricao)}</span>${unavailable ? `<small>Já escolhida por ${escapeHtml(owner)}.</small>` : `<small>Diferencial disponível.</small>`}</div></button>`;
+      return `<button class="picker-item style-picker-item ${unavailable ? "unavailable" : ""}" data-index="${index}" type="button" ${unavailable ? "disabled" : ""}><span class="catalog-icon">${uniIcon("vantagens", advantage.key, svg(advantage.icon))}</span><div><strong>${escapeHtml(advantage.nome)}</strong><span>${escapeHtml(advantage.descricao)}</span>${unavailable ? `<small>Já escolhida por ${escapeHtml(owner)}.</small>` : `<small>Diferencial disponível.</small>`}</div></button>`;
     }).join("")}
   `;
   advantageList.querySelectorAll(".picker-item").forEach((button) => button.addEventListener("click", () => {

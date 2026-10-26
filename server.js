@@ -23,7 +23,7 @@ const PORTRAIT_DIR = path.join(UPLOADS_DIR, "portraits");
 // Coleção independente das imagens de documentos (PNG com transparência preservada).
 const INSPECTION_IMAGES_DIR = path.join(PUBLIC_DIR, "inspection-images");
 fs.mkdirSync(INSPECTION_IMAGES_DIR, { recursive: true });
-const APP_VERSION = "v72-status-audio-sincronizado";
+const APP_VERSION = "v73-final-pc-mobile";
 const DICE_ANIMATION_MS = 3000;
 const { deathAudioType, diceRevealAudioType } = require("./lib/sound-rules");
 const { chooseJumpscare } = require("./lib/jumpscare-rules");
@@ -34,13 +34,20 @@ app.use((req, res, next) => {
   res.setHeader("X-Uma-Noite-Version", APP_VERSION);
   next();
 });
+// Compatibilidade: antigos arquivos e URLs em cache seguem funcionando após a organização.
+const LEGACY_ASSETS = require("./lib/legacy-assets-map.json");
+app.get(/^\/assets\/.+/, (req, res, next) => {
+  const dest = LEGACY_ASSETS[req.path];
+  if (!dest) return next();
+  res.redirect(302, dest);
+});
 app.use(express.static(PUBLIC_DIR, {
   setHeaders(res) {
     res.setHeader("Cache-Control", "no-cache");
   }
 }));
 
-const ALLOWED_THEME_PRESETS = new Set(["ciano", "magenta", "ambar", "verde", "violeta", "laranja", "azul"]);
+const ALLOWED_THEME_PRESETS = new Set(["ciano", "magenta", "ambar", "verde", "violeta", "laranja", "azul", "vermelho", "amarelo", "turquesa"]);
 
 const SURVIVOR_STYLES = {
   escapista: { key: "escapista", nome: "ESCAPISTA", stats: { cooperacao: 1, folego: 6, foco: 1 } },

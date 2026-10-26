@@ -1,6 +1,6 @@
 {
   "name": "uma-noite-no-inferno-vtt",
-  "version": "0.72.0",
+  "version": "0.73.0",
   "private": true,
   "description": "VTT local sincronizado para Uma Noite no Inferno, com ficha, painel do mestre e overlay OBS para PC, Android/Termux e Tailscale.",
   "main": "server.js",
