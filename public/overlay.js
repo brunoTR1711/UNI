@@ -55,10 +55,10 @@ const OVERLAY_AUDIO_MAP = {
   "state-morto": ["stateMorto", 0.96],
   "state-morto1": ["stateMorto1", 0.96],
   "state-morto2": ["stateMorto2", 0.96],
-  "roll-dice": ["rollDice", 0.82],
-  "roll-reveal-1": ["rollReveal1", 0.66],
-  "roll-reveal-2-19": ["rollReveal2to19", 0.62],
-  "roll-reveal-20": ["rollReveal20", 0.74],
+  "roll-dice": ["rollDice", 0.80],
+  "roll-reveal-1": ["rollReveal1", 0.76],
+  "roll-reveal-2-19": ["rollReveal2to19", 0.65],
+  "roll-reveal-20": ["rollReveal20", 0.78],
   killerHitLight: ["killerHitLight", 0.76],
   killerHitHeavy: ["killerHitHeavy", 0.84],
   killerCritical: ["killerCritical", 0.92],
@@ -223,7 +223,7 @@ function render(characters) {
             <div class="vhs-scanlines"></div>
             <div class="vhs-chroma vhs-chroma-red"></div>
             <div class="vhs-chroma vhs-chroma-blue"></div>
-            <div class="vhs-osd vhs-osd-top"><span>REC</span><span>CAM ${escapeHtml(character.id).slice(0, 2).toUpperCase() || '01'}</span><span>SP</span></div>
+            <div class="vhs-osd vhs-osd-top"><span>REC</span><span> ${escapeHtml(character.id).slice(0, 2).toUpperCase() || '01'}</span><span>-</span></div>
             <div class="vhs-character-name">${escapeHtml(character.nome || 'NOME PERSONAGEM')}</div>
             <div class="vhs-portrait">${portrait ? `<img src="${portrait}" alt="${escapeHtml(character.nome)}" />` : `<span>NO IMAGE</span>`}</div>
             ${renderOverlayEffects(character)}
