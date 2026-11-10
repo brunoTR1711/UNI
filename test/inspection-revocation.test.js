@@ -15,6 +15,12 @@ function boot(seed) {
   const dataDir = path.join(temp, 'data');
   fs.mkdirSync(dataDir);
   fs.writeFileSync(path.join(dataDir, 'state.json'), JSON.stringify(seed));
+  // O servidor valida todos os documentos HTML na inicialização (v78.1).
+  const publicDir = path.join(temp, 'public');
+  fs.mkdirSync(publicDir);
+  for (const filename of fs.readdirSync(path.join(__dirname, '../public')).filter(name => name.endsWith('.html'))) {
+    fs.copyFileSync(path.join(__dirname, '../public', filename), path.join(publicDir, filename));
+  }
   const routes = new Map();
   const handlers = new Map();
   const events = [];
@@ -23,7 +29,15 @@ function boot(seed) {
   const server = { address: () => ({ port: 3000 }), listen(_port, _host, fn) { fn(); } };
   const io = {
     on(event, fn) { if (event === 'connection') this.connection = fn; },
-    emit(name, data) { events.push({ name, data }); }
+    emit(name, data) { events.push({ name, data }); },
+    to(firstRoom) {
+      const rooms = new Set([firstRoom]);
+      const broadcaster = {
+        to(room) { rooms.add(room); return broadcaster; },
+        emit(name, data) { events.push({ name, data, rooms: [...rooms] }); }
+      };
+      return broadcaster;
+    }
   };
   const context = vm.createContext({
     __dirname: temp, process: { env: { PORT: '3000' }, once() {}, exit() {} },
@@ -40,7 +54,7 @@ function boot(seed) {
     }
   });
   vm.runInContext(serverSource, context, { filename: 'server.js' });
-  io.connection({ id: 'test-master', on(name, fn) { handlers.set(name, fn); }, emit() {} });
+  io.connection({ id: 'test-master', data: {}, join() {}, leave() {}, on(name, fn) { handlers.set(name, fn); }, emit() {} });
   const invoke = (name, payload) => {
     let response;
     const handler = handlers.get(name);
@@ -118,6 +132,7 @@ test('jumpscare global envia a mesma faixa para todos, sem modificar o estado', 
     assert.equal(presentation.data.scope, 'global');
     assert.equal(presentation.data.visual, null);
     assert.equal(presentation.data.audioType, 'killerJumpscare2');
+    assert.deepEqual(new Set(audio.rooms), new Set(['audio:fx','audio:players']));
     assert.equal(audio.data.type, presentation.data.audioType);
     assert.equal(audio.data.global, true);
     assert.equal(audio.data.jumpscareEventId, presentation.data.id);

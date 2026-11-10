@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050607">
+  <title>UNI — Discord no OBS (sem bot)</title>
+  <link rel="stylesheet" href="/discord-obs.css?v=78">
+</head>
+<body>
+<main class="shell">
+  <header class="masthead">
+    <a href="/" class="back">← VOLTAR À CENTRAL</a>
+    <p class="eyebrow">UMA NOITE NO INFERNO • OBS / STREAMKIT</p>
+    <h1>RETRATOS REATIVOS À VOZ</h1>
+    <p>Sem bot e sem instalar programas. Copie um CSS para a fonte de navegador do Discord no OBS: em silêncio, o retrato escurece; falando, recupera o brilho.</p>
+  </header>
+
+  <section class="panel" aria-label="Configuração para OBS">
+    <h2>1. Configure um personagem</h2>
+    <div class="form-grid">
+      <label>Personagem
+        <select id="character"><option value="">Carregando personagens…</option></select>
+      </label>
+      <label>ID do usuário no Discord
+        <input id="discord-id" inputmode="numeric" pattern="[0-9]{15,22}" placeholder="Ex.: 123456789012345678" autocomplete="off">
+      </label>
+      <label class="wide"><span>Link do widget <strong>Voice</strong> do Discord StreamKit</span>
+        <input id="streamkit-url" inputmode="url" placeholder="https://streamkit.discord.com/overlay/voice/…" autocomplete="off">
+      </label>
+    </div>
+    <p class="hint">Para copiar o ID: Discord → Configurações → Avançado → Modo desenvolvedor → clique com o botão direito no usuário → <strong>Copiar ID</strong>.</p>
+    <details class="advanced">
+      <summary>Ajustar posição / intensidade (opcional)</summary>
+      <p>Estes valores correspondem ao retângulo da imagem da UNI em uma fonte <strong>960 × 720</strong>. Mantenha os padrões se não alterou o tamanho interno do overlay.</p>
+      <div class="advanced-grid">
+        <label>Posição X<input id="mask-x" type="number" min="0" max="9000" value="20"></label>
+        <label>Posição Y<input id="mask-y" type="number" min="0" max="9000" value="20"></label>
+        <label>Largura<input id="mask-width" type="number" min="1" max="9000" value="900"></label>
+        <label>Altura<input id="mask-height" type="number" min="1" max="9000" value="560"></label>
+      </div>
+      <label>Escurecimento: <output id="shade-value">58%</output>
+        <input id="shade" type="range" min="15" max="90" step="1" value="58">
+      </label>
+      <button id="reset-settings" class="subtle" type="button">RESTAURAR VALORES</button>
+    </details>
+  </section>
+
+  <section class="panel" aria-label="Prévia do efeito">
+    <div class="preview-title">
+      <h2>2. Confira o comportamento</h2>
+      <button type="button" id="preview-toggle" class="subtle">SIMULAR FALA</button>
+    </div>
+    <div class="preview-card" id="preview-card">
+      <div class="preview-portrait" id="preview-portrait">
+        <div class="preview-face" aria-hidden="true">◈</div>
+        <span id="preview-name">PERSONAGEM</span>
+      </div>
+      <div class="preview-status" id="preview-status">SILÊNCIO — RETRATO ESCURECIDO</div>
+    </div>
+    <p class="hint">Prévia ilustrativa. A imagem real e a troca automática de estados continuam sendo responsabilidade do overlay da UNI.</p>
+  </section>
+
+  <section class="panel" aria-label="Instalação no OBS">
+    <h2>3. Coloque no OBS</h2>
+    <ol>
+      <li>Com o <strong>Discord aberto no mesmo PC do OBS</strong>, abra o <a href="https://streamkit.discord.com/overlay" target="_blank" rel="noopener noreferrer">Discord StreamKit</a>, escolha <strong>Voice</strong> e o canal de voz da mesa. Copie o URL do widget e cole no campo acima.</li>
+      <li>Crie uma fonte de navegador para o personagem, com o endereço da UNI abaixo e resolução <strong>960 × 720</strong>.</li>
+      <li>Crie outra <strong>Fonte de navegador</strong> com o URL do StreamKit, também em <strong>960 × 720</strong>. Cole o CSS gerado em <strong>CSS personalizado</strong>.</li>
+      <li>Coloque a fonte <strong>StreamKit acima da fonte UNI</strong> no OBS. Deixe ambas exatamente na mesma posição e com a mesma escala (pode agrupar as duas).</li>
+      <li>Entre no canal de voz e teste falando. Se necessário, clique com o botão direito na fonte StreamKit → <strong>Interagir</strong> e autorize o Discord.</li>
+    </ol>
+    <div class="copy-line">
+      <label for="uni-url">URL do overlay individual da UNI</label>
+      <div class="field-action"><input id="uni-url" readonly><button type="button" id="copy-uni">COPIAR URL</button></div>
+    </div>
+    <div class="copy-line">
+      <label for="copy-streamkit-url">URL do widget do StreamKit</label>
+      <div class="field-action"><input id="copy-streamkit-url" readonly><button type="button" id="copy-streamkit">COPIAR URL</button></div>
+    </div>
+    <div class="copy-line">
+      <label for="generated-css">CSS personalizado da fonte StreamKit</label>
+      <textarea id="generated-css" spellcheck="false" readonly rows="16" placeholder="Informe o ID do Discord para gerar o CSS…"></textarea>
+      <button type="button" id="copy-css" class="primary" disabled>COPIAR CSS PARA O OBS</button>
+    </div>
+    <p role="status" aria-live="polite" id="message"></p>
+  </section>
+  <section class="note">
+    <h2>IMPORTANTE</h2>
+    <p>O StreamKit não consegue editar diretamente outra página de navegador do OBS. A solução funciona com uma <strong>camada escura transparente</strong> posicionada sobre a área do retrato. Isso também escurece um pouco os textos/ícones que estiverem sobre essa área; não altera arquivos nem os estados de saúde da UNI. Quando o usuário não está no canal, o retrato permanece escurecido.</p>
+    <p>Use uma dupla de fontes por personagem. O recurso depende do widget Voice do Discord e de um OBS com suporte ao CSS <code>:has()</code>. Se o StreamKit não detectar voz no OBS, mantenha o Discord de desktop aberto e confira a conexão do widget.</p>
+  </section>
+</main>
+<script src="/discord-streamkit-generator.js?v=78"></script>
+<script src="/discord-obs.js?v=78"></script>
+</body>
+</html>

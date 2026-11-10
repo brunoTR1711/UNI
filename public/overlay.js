@@ -39,110 +39,12 @@ const {
 } = window.NevoaCommon.createDiceController();
 let renderedCharacters = [];
 let charactersSnapshot = "";
-let overlayAudioEnabled = localStorage.getItem("nevoa-overlay-audio-enabled") !== "0";
-let overlayAudioUnlocked = false;
-let lastOverlayAudioEventId = 0;
-let pendingOverlayAudioEvents = [];
-
-const OVERLAY_AUDIO_MAP = {
-  killerJumpscare1: ["killerJumpscare1", 1],
-  killerJumpscare2: ["killerJumpscare2", 1],
-  gained: ["gained", 0.74],
-  lost: ["lost", 0.80],
-  "state-ferido": ["stateFerido", 0.80],
-  "state-machucado": ["stateMachucado", 0.86],
-  "state-morrendo": ["stateMorrendo", 0.90],
-  "state-morto": ["stateMorto", 0.96],
-  "state-morto1": ["stateMorto1", 0.96],
-  "state-morto2": ["stateMorto2", 0.96],
-  "roll-dice": ["rollDice", 0.80],
-  "roll-reveal-1": ["rollReveal1", 0.76],
-  "roll-reveal-2-19": ["rollReveal2to19", 0.65],
-  "roll-reveal-20": ["rollReveal20", 0.78],
-  killerHitLight: ["killerHitLight", 0.76],
-  killerHitHeavy: ["killerHitHeavy", 0.84],
-  killerCritical: ["killerCritical", 0.92],
-  killerChase: ["killerChase", 0.78],
-  killerChaseEnd: ["killerChaseEnd", 0.68],
-  killerApparition: ["killerApparition", 0.78],
-  killerBreak: ["killerBreak", 0.84],
-  killerDrag: ["killerDrag", 0.82],
-  killerSpecial: ["killerSpecial", 0.82],
-  killerTorment: ["killerTorment", 0.82],
-  killerExecution: ["killerExecution", 0.96],
-  killerPhase: ["killerPhase", 0.90],
-  killerExposed: ["killerExposed", 0.80],
-  killerMark: ["killerMark", 0.78],
-  killerMiss: ["killerMiss", 0.68],
-  effectFeridaProfunda: ["effectFeridaProfunda", 0.78],
-  effectQuebrado: ["effectQuebrado", 0.78],
-  effectIncapacitado: ["effectIncapacitado", 0.78],
-  effectExposto: ["effectExposto", 0.78],
-  effectAlheio: ["effectAlheio", 0.78],
-  effectExaustao: ["effectExaustao", 0.78],
-  effectSorte: ["effectSorte", 0.78]
-};
+// Overlay estritamente visual. Nem os sons de dados/efeitos nem o jumpscare
+// são reproduzidos aqui; a trilha única para o OBS é a página /efeitos.
 function uniIcon(kind, key, fallback) {
   return window.UNIAssetIcons?.render(kind, key, fallback) || fallback;
 }
 function svg(key) { return CAT.svg[key] || CAT.svg.star || ""; }
-function eventMatchesThisOverlay(event) { if (!event) return false; if (!singleId) return true; return !event.characterId || event.characterId === singleId; }
-function ensureOverlayAudioPanel() {
-  let panel = document.getElementById("overlay-audio-panel");
-  if (!overlayAudioEnabled) { panel?.remove(); return; }
-  const ready = window.NevoaAudio?.isUnlocked?.();
-  overlayAudioUnlocked = Boolean(ready);
-  if (ready) { panel?.remove(); flushOverlayAudioQueue(); return; }
-  if (!panel) {
-    panel = document.createElement("button");
-    panel.id = "overlay-audio-panel";
-    panel.className = "overlay-audio-panel";
-    panel.type = "button";
-    panel.innerHTML = `<span class="overlay-audio-panel__pulse"></span><strong>ATIVAR SOM</strong><small>clique uma vez em Interagir</small>`;
-    panel.addEventListener("click", async () => { await unlockOverlayAudio(true); });
-    document.body.appendChild(panel);
-  }
-}
-async function unlockOverlayAudio(playConfirmation = false) {
-  overlayAudioEnabled = true;
-  localStorage.setItem("nevoa-overlay-audio-enabled", "1");
-  try {
-    await window.NevoaAudio?.unlock?.();
-    overlayAudioUnlocked = Boolean(window.NevoaAudio?.isUnlocked?.());
-    if (overlayAudioUnlocked && playConfirmation) await window.NevoaAudio?.play?.("gained", 0.40);
-  } catch (_) { overlayAudioUnlocked = false; }
-  ensureOverlayAudioPanel();
-  return overlayAudioUnlocked;
-}
-async function playOverlayAudioEvent(event) {
-  if (!eventMatchesThisOverlay(event)) return;
-  const config = OVERLAY_AUDIO_MAP[event.type];
-  if (!config) return;
-  if (!overlayAudioEnabled || !window.NevoaAudio?.isUnlocked?.()) {
-    pendingOverlayAudioEvents.push({ ...event, queuedAt: Date.now() });
-    pendingOverlayAudioEvents = pendingOverlayAudioEvents.filter((item) => Date.now() - item.queuedAt <= 3500).slice(-10);
-    ensureOverlayAudioPanel();
-    return;
-  }
-  await window.NevoaAudio.play(config[0], config[1]);
-  // A revelação é um segundo evento emitido pelo servidor com o resultado real.
-  // Evita tocar um som genérico por timer em cada navegador.
-}
-function flushOverlayAudioQueue() {
-  if (!overlayAudioEnabled || !window.NevoaAudio?.isUnlocked?.()) return;
-  const events = pendingOverlayAudioEvents.filter((item) => Date.now() - item.queuedAt <= 3500).slice(-8);
-  pendingOverlayAudioEvents = [];
-  events.forEach((event, index) => setTimeout(() => playOverlayAudioEvent(event), index * 85));
-}
-socket.on("audio:event", (event) => {
-  if (!event || !event.type) return;
-  if (event.id && event.id <= lastOverlayAudioEventId) return;
-  lastOverlayAudioEventId = event.id || (lastOverlayAudioEventId + 1);
-  playOverlayAudioEvent(event);
-});
-window.addEventListener("pointerdown", () => { if (overlayAudioEnabled && !window.NevoaAudio?.isUnlocked?.()) unlockOverlayAudio(false); }, { once: true });
-unlockOverlayAudio(false);
-setInterval(ensureOverlayAudioPanel, 1400);
 
 function activateIncomingRoll(characterId, resource, roll, key) {
   // Garante que telas remotas (PC/OBS/Tailscale) criem a UI da rolagem

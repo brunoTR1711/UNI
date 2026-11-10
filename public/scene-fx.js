@@ -29,14 +29,9 @@
   let clearTimer = null;
   let animationGeneration = 0;
 
-  const audioMap = {
-    killerHitLight:'killerHitLight', killerHitHeavy:'killerHitHeavy', killerCritical:'killerCritical',
-    killerChase:'killerChase', killerChaseEnd:'killerChaseEnd', killerApparition:'killerApparition',
-    killerBreak:'killerBreak', killerDrag:'killerDrag', killerSpecial:'killerSpecial',
-    killerTorment:'killerTorment', killerExecution:'killerExecution', killerPhase:'killerPhase',
-    killerExposed:'killerExposed', killerMark:'killerMark', killerMiss:'killerMiss',
-    effectFeridaProfunda:'effectFeridaProfunda', effectQuebrado:'effectQuebrado', effectIncapacitado:'effectIncapacitado', effectExposto:'effectExposto', effectAlheio:'effectAlheio', effectExaustao:'effectExaustao', effectSorte:'effectSorte'
-  };
+  const isFxPage = viewMode === 'effects-global' || viewMode === 'effects-target';
+  // /efeitos é a única página inscrita no canal de áudio da transmissão.
+  if (isFxPage) socket.on('connect', () => socket.emit('audio:subscribe', { channel: 'fx' }));
 
   function layer(){
     let l = document.getElementById('scene-fx-layer');
@@ -70,6 +65,7 @@
   }
 
   function panel(){
+    if(!isFxPage) return;
     if(window.NevoaAudio?.isUnlocked?.()) return document.getElementById('fx-audio-panel')?.remove();
     if(document.getElementById('fx-audio-panel')) return;
     const b = document.createElement('button');
@@ -109,20 +105,20 @@
     return true;
   }
 
-  async function play(e){
-    // Em overlays de jogador, overlay.js já reproduz o audio:event filtrado pelo alvo.
-    if(viewMode === 'player-overlay' || viewMode === 'player-overlay-general') return;
-    if(!e.audio) return;
-    if(!window.NevoaAudio?.isUnlocked?.()){ panel(); return; }
-    await window.NevoaAudio.play(audioMap[e.audio] || e.audio, e.intensity === 'extreme' ? .94 : e.intensity === 'heavy' ? .82 : .68);
-  }
-
+  // A apresentação cênica é exclusivamente visual. O som vem de audio:event
+  // (uma única vez), nunca do próprio scene:event.
   function clearFxClasses(){
     document.body.classList.remove('screen-shake-light','screen-shake-heavy','screen-shake-extreme');
   }
 
   function show(e){
     if(!shouldShow(e)) return;
+    // Mantém callbacks cênicos usados em algumas telas antigas, mas sem
+    // criar event-card, overlay FX ou tocar som fora de /efeitos.
+    if (!isFxPage) {
+      document.dispatchEvent(new CustomEvent('nevoa:scene-event', { detail: e }));
+      return;
+    }
 
     animationGeneration += 1;
     const generation = animationGeneration;
@@ -191,21 +187,38 @@
       }, 720);
     }, 4300);
 
-    play(e);
     document.dispatchEvent(new CustomEvent('nevoa:scene-event', { detail:e }));
   }
 
-  // Efeitos globais exclusivamente sonoros. A camada /efeitos os reproduz,
-  // mas overlays individuais são atendidos por overlay.js (sem duplicação).
-  let lastJumpscareAudioId = 0;
-  socket.on('audio:event', (event) => {
-    if (viewMode !== 'effects-global' && viewMode !== 'effects-target' && viewMode !== 'assassin-overlay') return;
-    if (event?.type !== 'killerJumpscare1' && event?.type !== 'killerJumpscare2') return;
-    if (event.id && event.id <= lastJumpscareAudioId) return;
-    lastJumpscareAudioId = event.id || lastJumpscareAudioId + 1;
-    if (!window.NevoaAudio?.isUnlocked?.()) { panel(); return; }
-    window.NevoaAudio?.play?.(event.type, 1);
-  });
+  // O servidor entrega áudio somente a esta página e às fichas abertas.
+  // O FX global reproduz tudo; /efeitos/:id filtra por personagem.
+  let lastFxAudioId = 0;
+  let queuedFxAudio = [];
+  function playFxAudio(event) {
+    const config = window.NevoaAudio?.resolveEventSound?.(event?.type);
+    if (!config) return;
+    if (!window.NevoaAudio?.isUnlocked?.()) {
+      queuedFxAudio.push({ event, queuedAt: Date.now() });
+      queuedFxAudio = queuedFxAudio.filter(item => Date.now() - item.queuedAt < 3500).slice(-10);
+      panel();
+      return;
+    }
+    window.NevoaAudio.play(config[0], config[1]);
+  }
+  function flushFxAudio() {
+    const pending = queuedFxAudio.filter(item => Date.now() - item.queuedAt < 3500);
+    queuedFxAudio = [];
+    pending.forEach(({ event }) => playFxAudio(event));
+  }
+  if (isFxPage) {
+    document.addEventListener('nevoa:audio-unlocked', flushFxAudio);
+    socket.on('audio:event', (event) => {
+      if (!event?.type || (event.id && event.id <= lastFxAudioId)) return;
+      lastFxAudioId = event.id || lastFxAudioId + 1;
+      if (viewMode === 'effects-target' && event.characterId && event.characterId !== filterId) return;
+      playFxAudio(event);
+    });
+  }
 
   socket.on('scene:event', (e)=>{
     if(!e || !Number.isFinite(Number(e.id)) || Number(e.id) <= last) return;
@@ -214,11 +227,13 @@
   });
 
   window.addEventListener('pointerdown', async()=>{
-    if(!window.NevoaAudio?.isUnlocked?.()) await window.NevoaAudio?.unlock?.();
+    if(isFxPage && !window.NevoaAudio?.isUnlocked?.()) await window.NevoaAudio?.unlock?.();
     panel();
   }, { once:true });
 
-  // Áudios são decodificados sob demanda; evita travar Android na abertura. 
-  setTimeout(panel, 500);
-  layer();
+  // Áudios são decodificados sob demanda no FX. Overlays não criam camada.
+  if (isFxPage) {
+    setTimeout(panel, 500);
+    layer();
+  }
 })();

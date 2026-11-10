@@ -23,7 +23,7 @@ const PORTRAIT_DIR = path.join(UPLOADS_DIR, "portraits");
 // Coleção independente das imagens de documentos (PNG com transparência preservada).
 const INSPECTION_IMAGES_DIR = path.join(PUBLIC_DIR, "inspection-images");
 fs.mkdirSync(INSPECTION_IMAGES_DIR, { recursive: true });
-const APP_VERSION = "v73-final-pc-mobile";
+const APP_VERSION = "v78.1-correcao-rotas-html";
 const DICE_ANIMATION_MS = 3000;
 const { deathAudioType, diceRevealAudioType } = require("./lib/sound-rules");
 const { chooseJumpscare } = require("./lib/jumpscare-rules");
@@ -42,6 +42,7 @@ app.get(/^\/assets\/.+/, (req, res, next) => {
   res.redirect(302, dest);
 });
 app.use(express.static(PUBLIC_DIR, {
+  index: false, // a raiz / tambem deve passar pelo HTML validado em memoria
   setHeaders(res) {
     res.setHeader("Cache-Control", "no-cache");
   }
@@ -436,9 +437,18 @@ function emitState() {
   saveState();
   io.emit("state:update", state);
 }
+// Um único canal do servidor para cada som. Sem som no painel do mestre,
+// overlays, páginas genéricas ou /audio (que agora é somente informativa).
+const FX_AUDIO_ROOM = "audio:fx";
+const PLAYERS_AUDIO_ROOM = "audio:players";
 function emitAudio(type, payload = {}) {
   audioSequence += 1;
-  io.emit("audio:event", { id: audioSequence, type, ...payload, at: Date.now() });
+  const event = { id: audioSequence, type, ...payload, at: Date.now() };
+  const targetId = sanitizeId(payload.characterId);
+  const recipients = targetId
+    ? io.to(FX_AUDIO_ROOM).to(`audio:player:${targetId}`)
+    : io.to(FX_AUDIO_ROOM).to(PLAYERS_AUDIO_ROOM);
+  recipients.emit("audio:event", event);
 }
 function broadcastScene(event) {
   sceneSequence += 1;
@@ -574,23 +584,67 @@ function normalizeInspectionDocument(payload, existing) {
   };
 }
 
-app.get("/", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
-app.get("/mestre", (_, res) => res.sendFile(path.join(__dirname, "public", "mestre.html")));
-app.get("/jogadores", (_, res) => res.sendFile(path.join(__dirname, "public", "jogadores.html")));
-app.get("/jogador/:id", (_, res) => res.sendFile(path.join(__dirname, "public", "jogador.html")));
-app.get("/overlay", (_, res) => res.sendFile(path.join(__dirname, "public", "overlay.html")));
-app.get("/overlay/:id", (_, res) => res.sendFile(path.join(__dirname, "public", "overlay.html")));
-app.get("/audio", (_, res) => res.sendFile(path.join(__dirname, "public", "audio.html")));
-app.get("/assassinos", (_, res) => res.sendFile(path.join(__dirname, "public", "assassinos.html")));
-app.get("/assassino/overlay", (_, res) => res.sendFile(path.join(__dirname, "public", "assassino-overlay.html")));
-app.get("/assassino/overlay/:id", (_, res) => res.sendFile(path.join(__dirname, "public", "assassino-overlay.html")));
-app.get("/efeitos", (_, res) => res.sendFile(path.join(__dirname, "public", "effects.html")));
-app.get("/efeitos/:id", (_, res) => res.sendFile(path.join(__dirname, "public", "effects.html")));
+// v78.1: as paginas sao carregadas e verificadas na inicializacao, depois
+// enviadas da memoria. Evita o uso de streams sendFile nas rotas HTML (um
+// problema observado em uma instalacao Termux devolveu fragmentos de pacotes
+// Node em vez dos documentos do projeto). Em caso de instalacao incompleta,
+// o erro fica explicito no terminal antes de o servidor aceitar conexoes.
+const HTML_PAGE_NAMES = Object.freeze([
+  "index.html", "mestre.html", "jogadores.html", "jogador.html",
+  "discord-obs.html", "overlay.html", "audio.html", "assassinos.html",
+  "assassino-overlay.html", "effects.html"
+]);
+const HTML_PAGES = Object.fromEntries(HTML_PAGE_NAMES.map((filename) => {
+  const body = fs.readFileSync(path.join(PUBLIC_DIR, filename), "utf8");
+  if (!/^\s*<!doctype html\b/i.test(body) || !/<html\b/i.test(body)) {
+    throw new Error(`Pagina HTML ausente ou corrompida: public/${filename}`);
+  }
+  return [filename, body];
+}));
+function serveHtmlPage(filename) {
+  return (_req, res) => {
+    // Nao reutilizar uma resposta HTML anterior armazenada no navegador/OBS.
+    res.setHeader("Cache-Control", "no-store, max-age=0");
+    res.type("html").send(HTML_PAGES[filename]);
+  };
+}
+app.get("/", serveHtmlPage("index.html"));
+app.get("/mestre", serveHtmlPage("mestre.html"));
+app.get("/jogadores", serveHtmlPage("jogadores.html"));
+app.get("/jogador/:id", serveHtmlPage("jogador.html"));
+app.get("/discord-obs", serveHtmlPage("discord-obs.html"));
+app.get("/overlay", serveHtmlPage("overlay.html"));
+app.get("/overlay/:id", serveHtmlPage("overlay.html"));
+app.get("/audio", serveHtmlPage("audio.html"));
+app.get("/assassinos", serveHtmlPage("assassinos.html"));
+app.get("/assassino/overlay", serveHtmlPage("assassino-overlay.html"));
+app.get("/assassino/overlay/:id", serveHtmlPage("assassino-overlay.html"));
+app.get("/efeitos", serveHtmlPage("effects.html"));
+app.get("/efeitos/:id", serveHtmlPage("effects.html"));
 app.get("/api/state", (_, res) => res.json(state));
 app.get("/api/network", (_, res) => res.json({ version: APP_VERSION, port: server.address()?.port || PORT, ips: getLocalIps() }));
 
 io.on("connection", (socket) => {
   socket.emit("state:update", state);
+
+  // A inscrição só é feita pela página FX ou por uma ficha ativa. As demais
+  // páginas nunca entram nessas salas, mesmo que mantenham código JS em cache.
+  socket.on("audio:subscribe", (payload = {}) => {
+    if (socket.data.audioRoom) socket.leave(socket.data.audioRoom);
+    socket.leave(PLAYERS_AUDIO_ROOM);
+    socket.data.audioRoom = null;
+    if (payload.channel === "fx") {
+      socket.join(FX_AUDIO_ROOM);
+      socket.data.audioRoom = FX_AUDIO_ROOM;
+    } else if (payload.channel === "player") {
+      const characterId = sanitizeId(payload.characterId);
+      if (!characterId) return;
+      const room = `audio:player:${characterId}`;
+      socket.join(room);
+      socket.join(PLAYERS_AUDIO_ROOM);
+      socket.data.audioRoom = room;
+    }
+  });
 
   // Jumpscare global: o mesmo arquivo e a mesma variante chegam a todos.
   // Evento separado dos efeitos cênicos, para não criar banners ou imagens agora.
@@ -610,7 +664,7 @@ io.on("connection", (socket) => {
     };
     // API reservada para imagens/animações futuras: jumpscare:event.
     io.emit("jumpscare:event", event);
-    // O canal audio:event já atende ficha, overlay, FX e página de áudio do OBS.
+    // Somente a fonte /efeitos e as fichas abertas recebem audio:event.
     emitAudio(event.audioType, { jumpscareEventId: event.id, global: true });
     ack?.({ ok: true, variant: event.variant, eventId: event.id });
   });

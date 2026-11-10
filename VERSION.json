@@ -1,6 +1,6 @@
 {
-  "version": "v73",
-  "build": "UNI-v73-final-pc-mobile",
-  "release": "2026-10-26",
+  "version": "v79",
+  "build": "UNI-v79-event-card-compacto-audio-controlado",
+  "release": "2026-11-08",
   "assets": "modulares, com fallback SVG"
 }

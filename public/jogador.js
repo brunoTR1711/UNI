@@ -52,34 +52,42 @@ const {
 } = window.NevoaCommon.createDiceController();
 const isTouchDevice = window.matchMedia?.("(pointer: coarse)")?.matches || false;
 
-// Cada condição tem seu próprio som. A ficha só toca eventos do seu personagem;
-// eventos do OBS, dados e recursos continuam nos canais anteriores.
-const CONDITION_SOUND_TYPES = new Set(CAT.effects.map((effect) => effect.audio).filter(Boolean));
-let lastConditionAudioEventId = 0;
-// Após o primeiro gesto, eventos de dano enviados pelo mestre podem tocar
-// automaticamente na ficha; sem interação prévia o navegador pode bloquear som.
+// A ficha recebe áudio somente enquanto está aberta; não é reproduzido
+// no mestre nem no overlay. O servidor envia efeitos ao alvo, sons globais
+// a todas as fichas e o mesmo evento à página /efeitos do OBS.
+const CONDITION_SOUND_TYPES = new Set(CAT.effects.map(effect => effect.audio).filter(Boolean));
+let lastPlayerAudioEventId = 0;
 document.addEventListener("pointerdown", () => window.NevoaAudio?.unlock?.(), { once: true, passive: true });
-const GLOBAL_SOUND_TYPES = new Set(["killerJumpscare1", "killerJumpscare2"]);
-const EXTRA_SOUND_EVENTS = {
-  // O alvo ouve o Estado de Saúde tanto pela ficha quanto pelo painel do mestre.
-  "state-ferido": ["stateFerido", 0.70],
-  "state-machucado": ["stateMachucado", 0.78],
-  "state-morrendo": ["stateMorrendo", 0.86],
-  killerJumpscare1: ["killerJumpscare1", 1],
-  killerJumpscare2: ["killerJumpscare2", 1],
-  "state-morto1": ["stateMorto1", 0.80],
-  "state-morto2": ["stateMorto2", 0.80],
-  "roll-reveal-1": ["rollReveal1", 0.50],
-  "roll-reveal-2-19": ["rollReveal2to19", 0.48],
-  "roll-reveal-20": ["rollReveal20", 0.54]
-};
-socket.on("audio:event", (event) => {
-  if (!event || (!GLOBAL_SOUND_TYPES.has(event.type) && event.characterId !== id)) return;
-  const sound = CONDITION_SOUND_TYPES.has(event.type) ? [event.type, 0.68] : EXTRA_SOUND_EVENTS[event.type];
-  if (!sound) return;
-  if (event.id && event.id <= lastConditionAudioEventId) return;
-  lastConditionAudioEventId = event.id || lastConditionAudioEventId + 1;
-  window.NevoaAudio?.play?.(sound[0], sound[1]);
+socket.on('connect', () => socket.emit('audio:subscribe', { channel: 'player', characterId: id }));
+
+function flashAppliedEffect() {
+  let flash = document.getElementById('player-applied-effect-flash');
+  if (!flash) {
+    flash = document.createElement('div');
+    flash.id = 'player-applied-effect-flash';
+    flash.className = 'player-applied-effect-flash';
+    flash.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(flash);
+  }
+  const rect = root.getBoundingClientRect();
+  flash.style.left = `${Math.round(rect.left)}px`;
+  flash.style.top = `${Math.round(rect.top)}px`;
+  flash.style.width = `${Math.round(rect.width)}px`;
+  flash.style.height = `${Math.round(rect.height)}px`;
+  flash.classList.remove('is-flashing');
+  void flash.offsetWidth; // Reinicia em aplicações consecutivas
+  flash.classList.add('is-flashing');
+}
+
+socket.on('audio:event', event => {
+  if (!event?.type) return;
+  if (event.id && event.id <= lastPlayerAudioEventId) return;
+  lastPlayerAudioEventId = event.id || lastPlayerAudioEventId + 1;
+  // Um alvo específico nunca deve tocar nas fichas de outros jogadores.
+  if (event.characterId && event.characterId !== id) return;
+  if (CONDITION_SOUND_TYPES.has(event.type)) flashAppliedEffect();
+  const config = window.NevoaAudio?.resolveEventSound?.(event.type);
+  if (config) window.NevoaAudio.play(config[0], config[1]);
 });
 
 socket.emit("character:create", { id });
@@ -142,12 +150,6 @@ function stackChange(resource, currentStacks) {
   if (currentStacks < previous) return { changedIndex: previous - 1, changeType: "lost" };
   return { changedIndex: null, changeType: "" };
 }
-function playStackSound(type) {
-  if (!type) return;
-  window.NevoaAudio?.unlock();
-  window.NevoaAudio?.play(type, 0.64);
-}
-
 function renderStyleStats(style) {
   const stats = style?.stats || { cooperacao: 0, folego: 0, foco: 0 };
   return `<div class="style-stat-row">
@@ -402,8 +404,6 @@ function handleAction(button) {
   if (action === "set-item-charges") {
     const slotIndex = Number(button.dataset.slot || 0);
     const next = Number(button.dataset.charges);
-    const current = character?.items?.[slotIndex]?.charges ?? 0;
-    playStackSound(next > current ? "gained" : "lost");
     socket.emit("item:setCharges", { id, slotIndex, charges: next });
   }
   if (action === "remove-effect") {
@@ -423,13 +423,9 @@ function handleAction(button) {
   if (action === "set-stacks") {
     const resource = button.dataset.resource;
     const nextStacks = Number(button.dataset.stacks);
-    const currentStacks = character?.resources?.[resource]?.stacks ?? 0;
-    playStackSound(nextStacks > currentStacks ? "gained" : "lost");
     socket.emit("resource:setStacks", { id, resource, stacks: nextStacks });
   }
   if (action === "roll-d20") {
-    window.NevoaAudio?.unlock();
-    window.NevoaAudio?.play("rollDice", 0.62);
     socket.emit("resource:rollD20", { id, resource: button.dataset.resource });
   }
 }

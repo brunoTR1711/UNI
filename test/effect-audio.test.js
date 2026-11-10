@@ -14,7 +14,6 @@ const types = context.window.NevoaAudio.sounds;
 const effects = context.window.NEVOA_PLAYER_CATALOG.effects;
 const server = fs.readFileSync(path.join(root, "server.js"), "utf8");
 const master = fs.readFileSync(path.join(root, "public", "mestre.js"), "utf8");
-const overlay = fs.readFileSync(path.join(root, "public", "overlay.js"), "utf8");
 const stream = fs.readFileSync(path.join(root, "public", "stream-audio.js"), "utf8");
 
 for (const effect of effects) {
@@ -28,8 +27,10 @@ for (const effect of effects) {
     assert.ok(bytes.length > 100);
     assert.equal(bytes.toString("utf8", 0, 4), "OggS");
     assert.ok(server.includes(`"${effect.key}": "${effect.audio}"`), "Servidor não usa o tipo correspondente");
-    assert.ok(overlay.includes(`${effect.audio}: ["${effect.audio}"`), "Overlay não reconhece o evento");
-    assert.ok(stream.includes(`${effect.audio}: ["${effect.audio}"`), "Áudio do OBS não reconhece o evento");
+    assert.deepEqual(Array.from(context.window.NevoaAudio.resolveEventSound(effect.audio)), [effect.audio, 0.78]);
+    assert.ok(master.includes('assassin:applyEffectToTarget'), 'Mestre aplica efeito pelo servidor');
+    assert.ok(server.includes('audio:subscribe'), 'Servidor restringe consumidores');
+    assert.ok(stream.includes(`${effect.audio}: ["${effect.audio}"`), "Mapa legado OBS preservado, mas desativado");
   });
 }
 

@@ -81,11 +81,16 @@ after(async () => {
 
 test("rotas existentes e revalidação de arquivos sem cache do estado", async () => {
   for (const route of ["/", "/mestre", "/jogadores", "/jogador/ana", "/overlay",
-    "/overlay/ana", "/audio", "/assassinos", "/assassino/overlay",
+    "/overlay/ana", "/discord-obs", "/audio", "/assassinos", "/assassino/overlay",
     "/assassino/overlay/ameaca", "/efeitos", "/efeitos/ameaca"]) {
     const response = await fetch(base + route);
     assert.equal(response.status, 200, route);
     assert.match(response.headers.get("content-type"), /text\/html/);
+    const html = await response.text();
+    assert.match(html, /^\s*<!doctype html\b/i, `${route}: body nao e HTML`);
+    assert.match(html, /<html\b/i, `${route}: tag html ausente`);
+    assert.match(html, /<title>/i, `${route}: titulo ausente`);
+    assert.equal(response.headers.get("cache-control"), "no-store, max-age=0", `${route}: HTML em cache`);
   }
   for (const asset of ["/style.css", "/common.js", "/assets/audio/recursos/stack-add.ogg"]) {
     const first = await fetch(base + asset);
@@ -97,6 +102,19 @@ test("rotas existentes e revalidação de arquivos sem cache do estado", async (
     assert.equal((await cached.arrayBuffer()).byteLength, 0);
   }
   assert.equal((await fetch(base + "/api/state")).headers.get("cache-control"), "no-store");
+});
+
+test("FX e central de jogadores entregam exatamente o HTML correto mesmo sob varias requisicoes", async () => {
+  const cases = [["/efeitos", "effects.html"], ["/jogadores", "jogadores.html"]];
+  for (const [route, filename] of cases) {
+    const expected = fs.readFileSync(path.join(root, "public", filename), "utf8");
+    const results = await Promise.all(Array.from({ length: 20 }, () => fetch(`${base}${route}`)));
+    for (const response of results) {
+      assert.equal(response.status, 200, route);
+      assert.match(response.headers.get("content-type"), /text\/html/i);
+      assert.equal(await response.text(), expected, `${route}: conteudo divergente de public/${filename}`);
+    }
+  }
 });
 
 test("personagens, bloqueio, estilos exclusivos, recursos, condições, itens e retratos", async () => {
@@ -136,6 +154,8 @@ test("personagens, bloqueio, estilos exclusivos, recursos, condições, itens e 
 });
 
 test("rolagens mantêm resultado, eventos e duração; alterações rápidas são persistidas", async () => {
+  // Desde a v76, audio:event só chega ao FX ou fichas assinadas.
+  await client.emit("audio:subscribe", { channel: "fx" });
   let result = await send("resource:rollD20", { id: "ana", resource: "foco" });
   const roll = result.characters.ana.resources.foco.lastRoll;
   assert.ok(roll.value >= 1 && roll.value <= 20);

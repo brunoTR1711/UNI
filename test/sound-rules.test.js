@@ -28,24 +28,20 @@ test('a faixa de dado depende do resultado real de 1 a 20', () => {
   assert.match(read('server.js'), /emitAudio\(diceRevealAudioType\(value\)/);
 });
 
-test('todas as variantes chegam a ficha, mestre, overlay e áudio do OBS', () => {
-  const players = read('public/jogador.js');
-  const master = read('public/mestre.js');
-  const overlay = read('public/overlay.js');
-  const stream = read('public/stream-audio.js');
-  const events = {
-    'state-morto1': 'stateMorto1',
-    'state-morto2': 'stateMorto2',
-    'roll-reveal-1': 'rollReveal1',
-    'roll-reveal-2-19': 'rollReveal2to19',
-    'roll-reveal-20': 'rollReveal20'
+test('todas as variantes são resolvidas uma vez por FX/ficha, não no mestre e overlay', () => {
+  const source = read('public/audio.js');
+  const map = {
+    'state-morto1': 'stateMorto1', 'state-morto2': 'stateMorto2',
+    'roll-reveal-1': 'rollReveal1', 'roll-reveal-2-19': 'rollReveal2to19', 'roll-reveal-20': 'rollReveal20'
   };
-  for (const [type, key] of Object.entries(events)) {
-    for (const script of [players,master,overlay,stream]) {
-      assert.ok(script.includes(`"${type}": ["${key}"`), `${type} não reconhecido em uma tela`);
-    }
-    assert.ok(sounds[key]?.endsWith('.ogg'), `Som inexistente: ${key}`);
+  for (const [type, key] of Object.entries(map)) {
+    assert.ok(source.includes(`"${type}": ["${key}"`), `Tipo ${type} ausente`);
+    assert.ok(sounds[key]?.endsWith('.ogg'), `Som ausente: ${key}`);
   }
+  assert.match(read('public/scene-fx.js'), /resolveEventSound/);
+  assert.match(read('public/jogador.js'), /resolveEventSound/);
+  assert.doesNotMatch(read('public/mestre.js'), /NevoaAudio(?:\?\.)?\.play(?:\?\.)?\(/);
+  assert.doesNotMatch(read('public/overlay.js'), /NevoaAudio(?:\?\.)?\.play(?:\?\.)?\(/);
 });
 
 test('todos os arquivos de substituição têm OGG real válido', () => {

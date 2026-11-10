@@ -14,16 +14,19 @@ test("mestre pode escolher áudio fixo", () => {
   assert.equal(chooseJumpscare("2").audioType, "killerJumpscare2");
   assert.equal(chooseJumpscare("10"), null);
 });
-test("evento preparado para visual futuro; audio global tem referências", () => {
+test("jumpscare global fica preparado para visual futuro e soa só no FX/fichas", () => {
   assert.equal(chooseJumpscare("1").visual, null);
   const server = fs.readFileSync(path.join(root, "server.js"), "utf8");
+  const audio = fs.readFileSync(path.join(root, "public/audio.js"), "utf8");
   const player = fs.readFileSync(path.join(root, "public/jogador.js"), "utf8");
   const fx = fs.readFileSync(path.join(root, "public/scene-fx.js"), "utf8");
   const overlay = fs.readFileSync(path.join(root, "public/overlay.js"), "utf8");
-  const obsAudio = fs.readFileSync(path.join(root, "public/stream-audio.js"), "utf8");
   assert.match(server, /socket.on\("jumpscare:trigger"/);
   assert.match(server, /io.emit\("jumpscare:event"/);
-  for (const source of [player,fx,overlay,obsAudio]) assert.match(source,/killerJumpscare1/);
+  assert.match(audio, /killerJumpscare1: \["killerJumpscare1", 1\]/);
+  assert.match(player, /resolveEventSound/);
+  assert.match(fx, /resolveEventSound/);
+  assert.doesNotMatch(overlay, /NevoaAudio(?:\?\.)?\.play(?:\?\.)?\(/);
   for (const variant of [1,2]) {
     const file = path.join(root, `public/assets/audio/jumpscare/killer-JUMPSCARE${variant}.ogg`);
     assert.ok(fs.existsSync(file));

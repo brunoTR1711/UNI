@@ -53,17 +53,18 @@ test('ficha e painel do mestre utilizam o mesmo emissor do servidor', () => {
   assert.match(server, /socket\.on\("assassin:damageTarget"[\s\S]*?damageCharacter\(character, delta\);/);
 });
 
-test('todos os receptores reconhecem os 3 áudios OGG de estado', () => {
+test('som de estado só é reproduzido no FX e na ficha aberta', () => {
   for (const [event, sound] of Object.entries({
-    'state-ferido': 'stateFerido',
-    'state-machucado': 'stateMachucado',
-    'state-morrendo': 'stateMorrendo'
+    'state-ferido': 'stateFerido', 'state-machucado': 'stateMachucado', 'state-morrendo': 'stateMorrendo'
   })) {
-    for (const [name, source] of Object.entries({ master, player, overlay, stream })) {
-      assert.ok(source.includes(`"${event}": ["${sound}"`), `${name}: ${event} não registrado`);
-    }
-    assert.ok(sounds.includes(`${sound}: "/assets/audio/estados/${event}.ogg"`), `${event}: arquivo de áudio`);
+    assert.ok(sounds.includes(`"${event}": ["${sound}"`), `${event}: tipo de evento`);
+    assert.ok(sounds.includes(`${sound}: "/assets/audio/estados/${event}.ogg"`), `${event}: arquivo`);
   }
+  assert.ok(player.includes("channel: 'player'"));
+  const fx = read('public/scene-fx.js');
+  assert.ok(fx.includes("channel: 'fx'"));
+  assert.doesNotMatch(master, /NevoaAudio(?:\?\.)?\.play(?:\?\.)?\(/);
+  assert.doesNotMatch(overlay, /NevoaAudio(?:\?\.)?\.play(?:\?\.)?\(/);
 });
 
 test('clique local não reproduz som antes da confirmação do servidor', () => {

@@ -1,27 +1,6 @@
 const socket = window.nevoaSocket || (window.nevoaSocket = io());
-// O servidor determina a variante do áudio uma única vez, para PC, tablet e OBS.
-const MASTER_RESULT_SOUNDS = {
-  // Som das caixas de saúde sempre segue o estado resultante enviado pelo servidor,
-  // independentemente de dano causado no mestre ou marcas alteradas na ficha.
-  "state-ferido": ["stateFerido", 0.70],
-  "state-machucado": ["stateMachucado", 0.78],
-  "state-morrendo": ["stateMorrendo", 0.86],
-  "state-morto1": ["stateMorto1", 0.78],
-  "state-morto2": ["stateMorto2", 0.78],
-  "roll-reveal-1": ["rollReveal1", 0.46],
-  "roll-reveal-2-19": ["rollReveal2to19", 0.44],
-  "roll-reveal-20": ["rollReveal20", 0.50],
-  killerJumpscare1: ["killerJumpscare1", 1],
-  killerJumpscare2: ["killerJumpscare2", 1]
-};
-let lastMasterResultAudioId = 0;
-document.addEventListener("pointerdown", () => window.NevoaAudio?.unlock?.(), { once: true, passive: true });
-socket.on("audio:event", (event) => {
-  const sound = MASTER_RESULT_SOUNDS[event?.type];
-  if (!sound || (event.id && event.id <= lastMasterResultAudioId)) return;
-  lastMasterResultAudioId = event.id || lastMasterResultAudioId + 1;
-  window.NevoaAudio?.play?.(sound[0], sound[1]);
-});
+// Painel do mestre é silencioso: os eventos de áudio são distribuídos
+// exclusivamente pelo servidor para /efeitos e para as fichas abertas.
 const Common = window.NevoaCommon;
 const CAT = window.NEVOA_PLAYER_CATALOG;
 const ACAT = window.NEVOA_ASSASSIN_CATALOG || { svg: {}, abilities: [], advantages: [] };
@@ -464,24 +443,17 @@ function handleAction(b) {
   if (action === "set-marks") {
     const nextMarks = Number(b.dataset.marks);
     // Apenas o servidor emite o áudio; evita tocar duas vezes no mesmo painel.
-    window.NevoaAudio?.unlock?.();
     socket.emit("character:setMarks", { id, marcasEstado: nextMarks, role: "master" });
   }
   if (action === "set-dead") {
-    window.NevoaAudio?.unlock?.();
     socket.emit("character:setDead", { id, dead: true, role: "master" });
   }
   if (action === "set-stacks") {
     const resource = b.dataset.resource;
     const next = Number(b.dataset.stacks);
-    const current = state.characters?.[id]?.resources?.[resource]?.stacks ?? 0;
-    window.NevoaAudio?.unlock();
-    window.NevoaAudio?.play(next > current ? "gained" : "lost", 0.6);
     socket.emit("resource:setStacks", { id, resource, stacks: next, role: "master" });
   }
   if (action === "roll-d20") {
-    window.NevoaAudio?.unlock();
-    window.NevoaAudio?.play("rollDice", 0.55);
     socket.emit("resource:rollD20", { id, resource: b.dataset.resource, role: "master" });
   }
   if (action === "remove-effect") {
@@ -520,8 +492,6 @@ jumpscareTrigger?.addEventListener("click", () => {
   if (jumpscareTrigger.disabled) return;
   jumpscareTrigger.disabled = true;
   jumpscareStatus.textContent = "ENVIANDO PARA TODOS...";
-  // Gesto do mestre permite desbloquear o áudio no navegador do mestre.
-  window.NevoaAudio?.unlock?.();
   socket.timeout(4000).emit("jumpscare:trigger", { variant: jumpscareVariant?.value || "random" }, (error, response) => {
     if (error || !response?.ok) {
       jumpscareStatus.textContent = response?.error || "Falha de conexão com o servidor.";
@@ -537,9 +507,7 @@ document.querySelectorAll("[data-threat]").forEach((button) => {
     const targetId = requireTarget(selectedDamageTargetId());
     if (!targetId) return;
     const kind = button.dataset.threat;
-    // O gesto libera o áudio do navegador do mestre; quem escolhe o som é o
-    // servidor, depois de calcular o novo Estado de Saúde do personagem.
-    window.NevoaAudio?.unlock?.();
+    // O servidor escolhe o som do Estado final; o mestre não reproduz som.
     if (kind === "damage-light") socket.emit("assassin:damageTarget", { id: THREAT_ID, targetCharacterId: targetId, amount: 1 });
     if (kind === "damage-heavy") socket.emit("assassin:damageTarget", { id: THREAT_ID, targetCharacterId: targetId, amount: 2 });
     if (kind === "damage-mortal") socket.emit("assassin:damageTarget", { id: THREAT_ID, targetCharacterId: targetId, amount: 3 });

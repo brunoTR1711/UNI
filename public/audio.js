@@ -42,12 +42,83 @@
     effectSorte: "/assets/audio/efeitos/killer-sorte.ogg"
   };
 
+  // Mapeamento único: todos os sons saem apenas em /efeitos e /jogador/:id.
+  // O servidor escolhe resultado, morte e condição antes de emitir o evento.
+  const eventSoundMap = Object.freeze({
+    gained: ["gained", 0.74], lost: ["lost", 0.80],
+    "state-ferido": ["stateFerido", 0.80],
+    "state-machucado": ["stateMachucado", 0.86],
+    "state-morrendo": ["stateMorrendo", 0.90],
+    "state-morto": ["stateMorto", 0.96],
+    "state-morto1": ["stateMorto1", 0.96],
+    "state-morto2": ["stateMorto2", 0.96],
+    "roll-dice": ["rollDice", 0.80],
+    "roll-reveal-1": ["rollReveal1", 0.70],
+    "roll-reveal-2-19": ["rollReveal2to19", 0.64],
+    "roll-reveal-20": ["rollReveal20", 0.76],
+    killerHitLight: ["killerHitLight", 0.76],
+    killerHitHeavy: ["killerHitHeavy", 0.84],
+    killerCritical: ["killerCritical", 0.92],
+    killerChase: ["killerChase", 0.78],
+    killerChaseEnd: ["killerChaseEnd", 0.68],
+    killerApparition: ["killerApparition", 0.78],
+    killerBreak: ["killerBreak", 0.84],
+    killerDrag: ["killerDrag", 0.82],
+    killerSpecial: ["killerSpecial", 0.82],
+    killerTorment: ["killerTorment", 0.82],
+    killerExecution: ["killerExecution", 0.96],
+    killerPhase: ["killerPhase", 0.90],
+    killerExposed: ["killerExposed", 0.80],
+    killerMark: ["killerMark", 0.78],
+    killerMiss: ["killerMiss", 0.68],
+    effectFeridaProfunda: ["effectFeridaProfunda", 0.78],
+    effectQuebrado: ["effectQuebrado", 0.78],
+    effectIncapacitado: ["effectIncapacitado", 0.78],
+    effectExposto: ["effectExposto", 0.78],
+    effectAlheio: ["effectAlheio", 0.78],
+    effectExaustao: ["effectExaustao", 0.78],
+    effectSorte: ["effectSorte", 0.78],
+    killerJumpscare1: ["killerJumpscare1", 1],
+    killerJumpscare2: ["killerJumpscare2", 1]
+  });
+  const resolveEventSound = type => eventSoundMap[type] || null;
+
   const buffers = new Map();
   const loading = new Map();
   let audioContext = null;
   let unlocked = false;
   let keepAliveOscillator = null;
+  // Mix geral para FX e fichas: ~-7,5 dB antes da compressão de picos.
+  // Mantém os OGG originais e o volume relativo entre eventos, sem alterar a distribuição.
+  const MASTER_VOLUME = 0.42;
+  let outputBus = null;
 
+  function clampVolume(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : 0;
+  }
+
+  function getOutputBus(context) {
+    if (outputBus) return outputBus;
+    // O compressor é compartilhado: atua também quando dois efeitos se sobrepõem.
+    // Na ausência desse recurso, o ganho mestre ainda reduz o volume do áudio.
+    const master = context.createGain();
+    master.gain.value = MASTER_VOLUME;
+    master.connect(context.destination);
+    if (typeof context.createDynamicsCompressor === 'function') {
+      const limiter = context.createDynamicsCompressor();
+      limiter.threshold.value = -20;
+      limiter.knee.value = 10;
+      limiter.ratio.value = 8;
+      limiter.attack.value = 0.005;
+      limiter.release.value = 0.28;
+      limiter.connect(master);
+      outputBus = limiter;
+    } else {
+      outputBus = master;
+    }
+    return outputBus;
+  }
   function getAudioContext() {
     if (!audioContext) {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -131,10 +202,10 @@
 
     const source = context.createBufferSource();
     const gain = context.createGain();
-    gain.gain.value = Math.max(0, Math.min(1, volume));
+    gain.gain.value = clampVolume(volume);
     source.buffer = buffer;
     source.connect(gain);
-    gain.connect(context.destination);
+    gain.connect(getOutputBus(context));
     source.onended = () => {
       source.disconnect();
       gain.disconnect();
@@ -149,7 +220,8 @@
     if (!src) return false;
     const audio = new Audio(src);
     audio.preload = "auto";
-    audio.volume = Math.max(0, Math.min(1, volume));
+    // Mesmo teto no fallback de browsers sem WebAudio.
+    audio.volume = clampVolume(volume) * MASTER_VOLUME;
     audio.play().catch(() => {
       document.dispatchEvent(new CustomEvent("nevoa:audio-blocked"));
     });
@@ -197,6 +269,7 @@
 
   window.NevoaAudio = {
     sounds,
+    resolveEventSound,
     unlock,
     preloadAll,
     play,

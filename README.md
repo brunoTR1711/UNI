@@ -155,3 +155,19 @@ A central inicial foi simplificada e inclui o guia de acesso Tailscale em **Como
 Os sons, artes de FX e ícones ficam separados em `public/assets/`. Para colocar ícones próprios, substitua os PNGs 1×1 de `public/assets/icons/` por PNGs reais sem mudar nomes. O SVG original segue visível enquanto não forem substituídos. Todos os arquivos estão mapeados em `docs/catalogo-icones-v73.csv`. Veja `docs/organizacao-assets-v73.md` para os caminhos atualizados, compatibilidade e instruções de atualização sem perder dados.
 
 As principais otimizações móveis removem o pré-carregamento/decodificação de todo o catálogo de sons e reduzem sombras/blurs pesados. Não alteram as animações de dados, documentos, estados ou eventos da stream.
+
+## v78 — Retratos reativos ao Discord no OBS, sem bot
+
+Abra **`/discord-obs`** a partir da Central ou do Painel Mestre. O assistente gera CSS personalizado para uma segunda **Fonte de navegador** do Discord StreamKit (Voice) sobre cada overlay individual `/overlay/:id`, usando duas fontes de 960 × 720 alinhadas no OBS. O retrato fica escuro em silêncio e recupera o brilho quando o usuário vinculado fala; a imagem de saúde continua sendo atualizada normalmente pela UNI. Não exige token, bot nem processo auxiliar. Veja `docs/streamkit-obs-v78.md` para configuração e limitações.
+
+## v78.1 — Correção do carregamento das páginas
+
+Corrigido o modo de servir as páginas HTML para evitar que `/efeitos` e `/jogadores` retornem conteúdo inesperado em instalações Termux. Veja `docs/correcao-rotas-html-v78.1.md`. As funcionalidades da v78 e da v76 foram preservadas.
+
+## v79 — Event-Card menor e áudio com volume controlado
+
+Na página **/efeitos** do OBS, os Event-Cards foram reduzidos e posicionados ao alto, centralizados, seguindo a referência de transmissão (fonte 1920 × 1080). Os textos permanecem redimensionados para legibilidade. A duração e as animações são as mesmas.
+
+Todos os sons do RPG usam um ganho mestre reduzido e um compressor de picos compartilhado no navegador. A emissão de áudio continua limitada ao **FX e às fichas abertas**, sem tocar no painel do mestre ou nos overlays.
+
+Para detalhes de edição e parâmetros, consulte `docs/ajustes-FX-v79.md`.

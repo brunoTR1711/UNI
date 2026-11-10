@@ -19,16 +19,22 @@ test('som de rolagem D20 usa o WAV original audível, não o OGG silencioso', ()
   assert.ok(pcm.some((byte) => byte !== 0), 'arquivo WAV não pode estar vazio');
 });
 
-test('início da rolagem segue atendendo mestre, jogador, overlay e áudio OBS', () => {
+test('início da rolagem atende apenas ao FX e à ficha aberta, via servidor', () => {
   assert.match(read('server.js'), /emitAudio\("roll-dice",\s*\{/);
-  assert.match(read('public/jogador.js'), /NevoaAudio\?\.play\("rollDice"/);
-  assert.match(read('public/mestre.js'), /NevoaAudio\?\.play\("rollDice"/);
-  assert.match(read('public/overlay.js'), /"roll-dice":\s*\["rollDice"/);
-  assert.match(read('public/stream-audio.js'), /"roll-dice":\s*\["rollDice"/);
+  assert.match(read('public/audio.js'), /"roll-dice": \["rollDice"/);
+  assert.match(read('public/jogador.js'), /audio:subscribe.*channel: 'player'/);
+  assert.match(read('public/scene-fx.js'), /audio:subscribe.*channel: 'fx'/);
+  for (const file of ['public/mestre.js','public/overlay.js']) {
+    assert.doesNotMatch(read(file), /NevoaAudio(?:\?\.)?\.play(?:\?\.)?\(/);
+  }
 });
 
-test('todos os canais carregam uma versão atualizada do áudio', () => {
-  for (const page of ['jogador.html', 'mestre.html', 'overlay.html', 'audio.html', 'effects.html', 'assassino-overlay.html']) {
-    assert.match(read(`public/${page}`), /\/audio\.js\?v=73/);
+test('apenas os canais autorizados carregam o módulo de áudio atualizado', () => {
+  for (const page of ['jogador.html', 'effects.html']) {
+    assert.match(read(`public/${page}`), /\/audio\.js\?v=(?:76|79)/);
+  }
+  assert.doesNotMatch(read('public/audio.html'), /\/audio\.js/);
+  for (const page of ['mestre.html', 'overlay.html', 'assassino-overlay.html']) {
+    assert.match(read(`public/${page}`), /\/audio\.js\?v=(?:76|79)/); // carregado, mas não acionado
   }
 });

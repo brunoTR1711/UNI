@@ -11,7 +11,7 @@ test('URLs antigas de assets têm destinos existentes',()=>{
     assert.ok(fs.existsSync(path.join(publicRoot,newPath)),`${oldPath} => ${newPath}`);
   }
 });
-test('placeholder transparente preserva símbolo original até substituição',()=>{
+test('placeholder mantém símbolo até PNG ser substituído; ícones personalizados são aceitos',()=>{
   const source=read('public/asset-icons.js');
   assert.match(source,/naturalWidth > 1/);
   const icons=path.join(publicRoot,'assets/icons');
@@ -19,11 +19,13 @@ test('placeholder transparente preserva símbolo original até substituição',(
     const folder=path.join(icons,kind);
     if(!fs.statSync(folder).isDirectory())continue;
     for(const file of fs.readdirSync(folder)){
-      assert.ok(file.endsWith('.png'));
+      if(!file.endsWith('.png'))continue; // guias e metadados não são sprites
       const buf=fs.readFileSync(path.join(folder,file));
-      assert.equal(buf.readUInt32BE(16),1);
-      assert.equal(buf.readUInt32BE(20),1);
-      assert.equal(buf[25],6);
+      assert.equal(buf.toString('ascii',1,4),'PNG');
+      const width=buf.readUInt32BE(16),height=buf.readUInt32BE(20);
+      assert.ok(width >= 1 && height >= 1);
+      assert.equal(buf[25],6, `PNG precisa preservar transparência: ${file}`);
+      if(width===1) assert.equal(height,1);
     }
   }
 });
